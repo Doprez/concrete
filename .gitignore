@@ -1,15 +1,9 @@
-# Visual Studio Code
+# editors
 .vscode/
-
-# Rider
 .idea/
-
-# Visual Studio
 .vs/
-
-# Fleet
 .fleet/
 
-# Build results
-[Bb]in/
-[Oo]bj/
+# dotnet
+bin/
+obj/
