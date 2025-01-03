@@ -1,5 +1,5 @@
 # Concrete
-Modern .NET 8 based game engine.
+Modern .NET 9 based game engine.
 
 ## Features
 
@@ -8,6 +8,7 @@ Modern .NET 8 based game engine.
 - simple imgui based editor
 - simple opengl renderer
 - supports any model file
+- skeletal animation
 
 ## Example
 ```csharp
