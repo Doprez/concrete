@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 
 namespace Concrete;
 
@@ -38,7 +39,7 @@ public static class SceneManager
 
     public static void StartScene() => loadedScene?.Start();
     public static void UpdateScene(float deltaTime) => loadedScene?.Update(deltaTime);
-    public static void RenderScene(float deltaTime, Perspective perspective) => loadedScene?.Render(deltaTime, perspective);
+    public static void RenderScene(float deltaTime, Matrix4x4 view, Matrix4x4 proj) => loadedScene?.Render(deltaTime, view, proj);
 }
 
 public enum PlayState

@@ -68,8 +68,8 @@ public class Scene
         foreach (var gameObject in gameObjects) gameObject.Update(deltaTime);
     }
 
-    public void Render(float deltaTime, Perspective projection)
+    public void Render(float deltaTime, Matrix4x4 view, Matrix4x4 proj)
     {
-        foreach (var gameObject in gameObjects) gameObject.Render(deltaTime, projection);
+        foreach (var gameObject in gameObjects) gameObject.Render(deltaTime, view, proj);
     }
 }

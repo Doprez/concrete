@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 
 namespace Concrete;
 
@@ -74,9 +75,9 @@ public class GameObject
         foreach (var component in components) component.Update(deltaTime);
     }
 
-    public void Render(float deltaTime, Perspective projection)
+    public void Render(float deltaTime, Matrix4x4 view, Matrix4x4 proj)
     {
         if (!enabled) return;
-        foreach (var component in components) component.Render(deltaTime, projection);
+        foreach (var component in components) component.Render(deltaTime, view, proj);
     }
 }

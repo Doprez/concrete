@@ -20,8 +20,8 @@ public static unsafe class Editor
     }
 
     public static SceneCamera sceneCamera = new();
-    public static Framebuffer sceneWindowFramebuffer = new();
-    public static Framebuffer gameWindowFramebuffer = new();
+    public static Framebuffer scene_fb = new();
+    public static Framebuffer game_fb = new();
     
     private static bool dockbuilderInitialized = false;
     private static bool sceneWindowFocussed = false;
@@ -39,8 +39,6 @@ public static unsafe class Editor
 
     public static void Update(float deltaTime)
     {
-        float sceneWindowAspect = (float)sceneWindowFramebuffer.size.X / (float)sceneWindowFramebuffer.size.Y;
-        sceneCamera.UpdatePerspective(sceneWindowAspect);
         if (sceneWindowFocussed) sceneCamera.ApplyMovement(deltaTime);
     }
 
@@ -99,17 +97,17 @@ public static unsafe class Editor
         sceneWindowFocussed = ImGui.IsWindowFocused();
         
         // render scene to framebuffer
-        sceneWindowFramebuffer.Resize(ImGui.GetContentRegionAvail());
-        sceneWindowFramebuffer.Bind();
-        sceneWindowFramebuffer.Clear(Color.DarkGray);
-        SceneManager.RenderScene(deltaTime, sceneCamera.perspective);
-        sceneWindowFramebuffer.Unbind();
+        scene_fb.Resize(ImGui.GetContentRegionAvail());
+        scene_fb.Bind();
+        scene_fb.Clear(Color.DarkGray);
+        SceneManager.RenderScene(deltaTime, sceneCamera.view, sceneCamera.proj);
+        scene_fb.Unbind();
 
         // record corner position
         var scenecornerpos = ImGui.GetCursorPos();
 
         // show framebuffer as image
-        ImGui.Image((nint)sceneWindowFramebuffer.colorTexture, sceneWindowFramebuffer.size, Vector2.UnitY, Vector2.UnitX);
+        ImGui.Image((nint)scene_fb.colorTexture, scene_fb.size, Vector2.UnitY, Vector2.UnitX);
 
         // imguizmo
         if (selectedGameObject != null)
@@ -123,7 +121,11 @@ public static unsafe class Editor
             ImGuizmo.SetRect(position.X, position.Y, size.X, size.Y);
 
             Matrix4x4 worldModelMatrix = selectedGameObject.transform.GetWorldModelMatrix();
-            ImGuizmo.Manipulate(ref sceneCamera.perspective.view, ref sceneCamera.perspective.proj, guizmoOperation, guizmoMode, ref worldModelMatrix);
+
+            Matrix4x4 sview, sproj;
+            sview = sceneCamera.view;
+            sproj = sceneCamera.proj;
+            ImGuizmo.Manipulate(ref sview, ref sproj, guizmoOperation, guizmoMode, ref worldModelMatrix);
             if (ImGuizmo.IsUsing()) selectedGameObject.transform.SetWorldModelMatrix(worldModelMatrix);
 
             Engine.opengl.Viewport(Engine.window.Size);
@@ -172,17 +174,18 @@ public static unsafe class Editor
         gameWindowFocussed = ImGui.IsWindowFocused();
 
         // render to framebuffer
-        gameWindowFramebuffer.Resize(ImGui.GetContentRegionAvail());
-        gameWindowFramebuffer.Bind();
-        gameWindowFramebuffer.Clear(Color.DarkGray);
-        SceneManager.RenderScene(deltaTime, SceneManager.loadedScene.FindAnyCamera().CalcPerspective());
-        gameWindowFramebuffer.Unbind();
+        game_fb.Resize(ImGui.GetContentRegionAvail());
+        game_fb.Bind();
+        game_fb.Clear(Color.DarkGray);
+        var cam = SceneManager.loadedScene.FindAnyCamera();
+        SceneManager.RenderScene(deltaTime, cam.view, cam.proj);
+        game_fb.Unbind();
 
         // record corner position
         var gamecornerpos = ImGui.GetCursorPos();
 
         // show framebuffer as image
-        ImGui.Image((nint)gameWindowFramebuffer.colorTexture, gameWindowFramebuffer.size, Vector2.UnitY, Vector2.UnitX);
+        ImGui.Image((nint)game_fb.colorTexture, game_fb.size, Vector2.UnitY, Vector2.UnitX);
 
         {
             var buttonsize = new Vector2(64, 0);

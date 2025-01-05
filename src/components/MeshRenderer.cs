@@ -35,13 +35,13 @@ public class MeshRenderer : Component
     }
     private string currentModelPath;
 
-    public override void Render(float deltaTime, Perspective perspective)
+    public override void Render(float deltaTime, Matrix4x4 view, Matrix4x4 proj)
     {
         shader.Use();
 
         // set camera
-        shader.SetMatrix4("view", perspective.view);
-        shader.SetMatrix4("proj", perspective.proj);
+        shader.SetMatrix4("view", view);
+        shader.SetMatrix4("proj", proj);
 
         // set lights
         shader.SetLights(SceneManager.loadedScene.FindActiveLights());

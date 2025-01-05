@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 
 namespace Concrete;
 
@@ -16,7 +17,7 @@ public class Component
         // can be overridden
     }
 
-    public virtual void Render(float deltaTime, Perspective projection)
+    public virtual void Render(float deltaTime, Matrix4x4 view, Matrix4x4 proj)
     {
         // can be overridden
     }

@@ -5,7 +5,9 @@ namespace Concrete;
 
 public class SceneCamera
 {
-    public Perspective perspective = new();
+    public Matrix4x4 view => Matrix4x4.CreateLookAt(position, position + forward, up);
+    public Matrix4x4 proj => Matrix4x4.CreatePerspectiveFieldOfView(MathF.PI * fov / 180f, (float)Editor.scene_fb.size.X / (float)Editor.scene_fb.size.Y, 0.1f, 1000f);
+
     public float fov = 90;
 
     public Vector3 position = new(-0.4f, 1.6f, 1.6f);
@@ -16,12 +18,6 @@ public class SceneCamera
     public Vector3 right => LocalDirection(Vector3.UnitX);
 
     private Vector2 lastMousePos;
-
-    public void UpdatePerspective(float aspect)
-    {
-        perspective.proj = Matrix4x4.CreatePerspectiveFieldOfView(MathF.PI * fov / 180f, aspect, 0.1f, 1000f);
-        perspective.view = Matrix4x4.CreateLookAt(position, position + forward, up);
-    }
 
     public void ApplyMovement(float deltaTime)
     {
