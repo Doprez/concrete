@@ -100,7 +100,7 @@ public static unsafe class Editor
         scene_fb.Resize(ImGui.GetContentRegionAvail());
         scene_fb.Bind();
         scene_fb.Clear(Color.DarkGray);
-        SceneManager.RenderScene(deltaTime, sceneCamera.view, sceneCamera.proj);
+        SceneManager.RenderSceneObjects(deltaTime, sceneCamera.view, sceneCamera.proj);
         scene_fb.Unbind();
 
         // record corner position
@@ -178,7 +178,7 @@ public static unsafe class Editor
         game_fb.Bind();
         game_fb.Clear(Color.DarkGray);
         var cam = SceneManager.loadedScene.FindAnyCamera();
-        SceneManager.RenderScene(deltaTime, cam.view, cam.proj);
+        SceneManager.RenderSceneObjects(deltaTime, cam.view, cam.proj);
         game_fb.Unbind();
 
         // record corner position

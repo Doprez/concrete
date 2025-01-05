@@ -60,7 +60,7 @@ public static class Engine
     static void UpdateWindow(double deltaTime)
     {
         Metrics.Update((float)deltaTime);
-        if (SceneManager.playState == PlayState.playing) SceneManager.UpdateScene((float)deltaTime);
+        if (SceneManager.playState == PlayState.playing) SceneManager.UpdateSceneObjects((float)deltaTime);
         Editor.Update((float)deltaTime);
         igcontroller.Update((float)deltaTime);
     }
