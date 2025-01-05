@@ -33,7 +33,28 @@ public static class Engine
         opengl = GL.GetApi(window);
         input = window.CreateInput();
         igcontroller = new ImGuiController(opengl, window, input);
-        SceneManager.LoadScene("res/scenes/test.scene");
+
+        var scene = new Scene();
+        SceneManager.LoadScene(scene);
+
+        var camera = GameObject.Create();
+        camera.AddComponent<Camera>();
+        camera.name = "Camera";
+
+        var helmet = GameObject.Create();
+        helmet.AddComponent<MeshRenderer>().modelPath = "res/models/helmet.glb";
+        helmet.name = "Helmet";
+
+        var robot = GameObject.Create();
+        robot.AddComponent<MeshRenderer>().modelPath = "res/models/robot.glb";
+        robot.transform.localPosition = new Vector3(2, 0, 0);
+        robot.transform.localEulerAngles = new Vector3(-90, 0, 0);
+        robot.name = "Robot";
+
+        var light = GameObject.Create();
+        light.AddComponent<DirectionalLight>();
+        light.transform.localEulerAngles = new Vector3(20, 135, 0);
+        light.name = "Light";
     }
 
     static void UpdateWindow(double deltaTime)
