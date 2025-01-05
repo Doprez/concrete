@@ -5,24 +5,15 @@ namespace Concrete;
 
 public class Shader
 {
-    private GL opengl;
+    private GL opengl => Engine.opengl;
+
     private uint handle;
 
-    public static Shader CreateDefault()
-    {
-        var shader = new Shader("res/shaders/default.vert", "res/shaders/default.frag");
-        return shader;
-    }
-
-    public static Shader CreateSkinned()
-    {
-        var shader = new Shader("res/shaders/skinned.vert", "res/shaders/default.frag");
-        return shader;
-    }
+    public static Shader CreateDefault() => new("res/shaders/default.vert", "res/shaders/default.frag");
+    public static Shader CreateSkinned() => new("res/shaders/skinned.vert", "res/shaders/default.frag");
 
     public Shader(string vertPath, string fragPath)
     {
-        opengl = Engine.opengl;
         handle = CompileProgram(vertPath, fragPath);
     }
 
@@ -53,13 +44,11 @@ public class Shader
 
     public unsafe void SetMatrix4(string name, Matrix4x4 value)
     {
-        opengl.UseProgram(handle);
         opengl.UniformMatrix4(opengl.GetUniformLocation(handle, name), 1, false, (float*)&value);
     }
 
     public unsafe void SetTexture(string name, uint texture, int unit)
     {
-        opengl.UseProgram(handle);
         opengl.ActiveTexture(TextureUnit.Texture0 + unit);
         opengl.BindTexture(TextureTarget.Texture2D, texture);
         opengl.Uniform1(opengl.GetUniformLocation(handle, name), unit);
