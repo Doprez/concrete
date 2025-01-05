@@ -66,11 +66,11 @@ public static class ModelReader
 
         // read albedo
         var baseColorTexture = gltfMaterial.FindChannel("BaseColor")?.Texture;
-        if (baseColorTexture != null) material.albedoTexture = LoadTexture(baseColorTexture.PrimaryImage, 2);
+        if (baseColorTexture != null) material.albedoTexture = LoadTexture(baseColorTexture.PrimaryImage, 0);
 
         // read roughness
         var metallicRoughnessTexture = gltfMaterial.FindChannel("MetallicRoughness")?.Texture;
-        if (metallicRoughnessTexture != null) material.roughnessTexture = LoadTexture(metallicRoughnessTexture.PrimaryImage, 3);
+        if (metallicRoughnessTexture != null) material.roughnessTexture = LoadTexture(metallicRoughnessTexture.PrimaryImage, 1);
 
         cmesh.material = material;
 
@@ -78,17 +78,8 @@ public static class ModelReader
         return cmesh;
     }
 
-    private static unsafe uint LoadTexture(Image gltf_image, int textureUnit)
+    private static unsafe uint LoadTexture(Image gltf_image, int unit)
     {
-        // create texture
-        Engine.opengl.ActiveTexture(TextureUnit.Texture0 + textureUnit);
-        uint texture = Engine.opengl.GenTexture();
-        Engine.opengl.BindTexture(GLEnum.Texture2D, texture);
-        Engine.opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)GLEnum.Repeat);
-        Engine.opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)GLEnum.Repeat);
-        Engine.opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)GLEnum.Nearest);
-        Engine.opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)GLEnum.Nearest);
-
         // imagesharp
         var bytes = gltf_image.Content.Content.Span;
         var is_image = SixLabors.ImageSharp.Image.Load<Rgba32>(bytes);
@@ -97,11 +88,17 @@ public static class ModelReader
         byte[] rawdata = new byte[width * height * 4];
         is_image.CopyPixelDataTo(rawdata);
 
-        // send rawdata
+        // create texture
+        uint texture = Engine.opengl.GenTexture();
+        Engine.opengl.ActiveTexture(TextureUnit.Texture0 + unit);
+        Engine.opengl.BindTexture(GLEnum.Texture2D, texture);
+        Engine.opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)GLEnum.Repeat);
+        Engine.opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)GLEnum.Repeat);
+        Engine.opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)GLEnum.Nearest);
+        Engine.opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)GLEnum.Nearest);
         fixed (void* pointer = rawdata) Engine.opengl.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba, (uint)width, (uint)height, 0, PixelFormat.Rgba, GLEnum.UnsignedByte, pointer);
-
-        // unbind and return
         Engine.opengl.BindTexture(GLEnum.Texture2D, 0);
+
         return texture;
     }
 }

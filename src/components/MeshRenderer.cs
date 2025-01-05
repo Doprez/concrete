@@ -64,10 +64,10 @@ public class MeshRenderer : Component
             shader.SetVector4("matColor", mesh.material.color);
             var hasAlbedo = mesh.material.albedoTexture != null;
             shader.SetBool("matHasAlbedoTexture", hasAlbedo);
-            if (hasAlbedo) shader.SetTexture("matAlbedoTexture", (uint)mesh.material.albedoTexture, 2);
+            if (hasAlbedo) shader.SetTexture("matAlbedoTexture", (uint)mesh.material.albedoTexture, 0);
             var hasRoughness = mesh.material.roughnessTexture != null;
             shader.SetBool("matHasRoughnessTexture", hasRoughness);
-            if (hasRoughness) shader.SetTexture("matRoughnessTexture", (uint)mesh.material.roughnessTexture, 3);
+            if (hasRoughness) shader.SetTexture("matRoughnessTexture", (uint)mesh.material.roughnessTexture, 1);
 
             // render mesh
             mesh.Render();
