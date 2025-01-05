@@ -21,7 +21,7 @@ public class MeshRenderer : Component
             currentModelPath = value;
 
             // extract all meshes
-            meshes = Extractor.GetMeshes(currentModelPath);
+            meshes = ModelReader.GetMeshes(currentModelPath);
 
             // create instance for animation
             instance = SceneTemplate.Create(ModelRoot.Load(currentModelPath).DefaultScene).CreateInstance();

@@ -2,7 +2,7 @@ global using Ceras;
 
 namespace Concrete;
 
-public static class Serialization
+public static class SceneSerializer
 {
     private static SerializerConfig config = new()
     {

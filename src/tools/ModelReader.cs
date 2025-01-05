@@ -5,7 +5,7 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace Concrete;
 
-public class Extractor
+public static class ModelReader
 {
     public static Mesh[] GetMeshes(string filePath)
     {
