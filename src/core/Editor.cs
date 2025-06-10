@@ -37,6 +37,10 @@ public static unsafe class Editor
     private static Type[] allTypes = Assembly.GetExecutingAssembly().GetTypes();
     private static Type[] componentTypes = allTypes.Where(type => type.IsClass && !type.IsAbstract && type != typeof(Transform) && type.IsSubclassOf(typeof(Component))).ToArray();
 
+    private static bool oFileDialogOpen = false;
+    private static bool sFileDialogOpen = false;
+    private static string fileDialogPath = "";
+
     public static void Update(float deltaTime)
     {
         if (sceneWindowFocussed) sceneCamera.ApplyMovement(deltaTime);
@@ -54,14 +58,18 @@ public static unsafe class Editor
         }
         reparentque.Clear();
 
+        // render file dialog if needed
+        if (oFileDialogOpen) FileDialog.Show(ref oFileDialogOpen, ref fileDialogPath, true, () => SceneManager.LoadScene(fileDialogPath));
+        if (sFileDialogOpen) FileDialog.Show(ref sFileDialogOpen, ref fileDialogPath, true, () => SceneManager.SaveScene(fileDialogPath));
+
         // begin main menu bar
         if (ImGui.BeginMainMenuBar())
         {
             // scene menu
-            if (ImGui.BeginMenu("Scene"))
+            if (ImGui.BeginMenu("File"))
             {
-                if (ImGui.MenuItem("Save current scene")) SceneManager.SaveScene();
-                if (ImGui.MenuItem("Load current scene")) SceneManager.LoadScene();
+                if (ImGui.MenuItem("Open")) oFileDialogOpen = true;
+                if (ImGui.MenuItem("Save")) sFileDialogOpen = true;
                 ImGui.EndMenu();
             }
 

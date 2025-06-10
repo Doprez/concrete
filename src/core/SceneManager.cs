@@ -31,10 +31,11 @@ public static class SceneManager
         LoadScene();
     }
 
-    public static void SaveScene() => SceneSerializer.SaveScene("res/scenes/test.scene", loadedScene);
     public static void LoadScene(Scene scene) => loadedScene = scene;
-    public static void LoadScene(string path) => loadedScene = SceneSerializer.LoadScene(path);
+    public static void SaveScene() => SceneSerializer.SaveScene("res/scenes/test.scene", loadedScene);
     public static void LoadScene() => SceneSerializer.LoadScene("res/scenes/test.scene");
+    public static void SaveScene(string path) => SceneSerializer.SaveScene(path, loadedScene);
+    public static void LoadScene(string path) => loadedScene = SceneSerializer.LoadScene(path);
 
     public static void StartSceneObjects() => loadedScene?.Start();
     public static void UpdateSceneObjects(float deltaTime) => loadedScene?.Update(deltaTime);
