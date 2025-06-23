@@ -31,6 +31,20 @@ public static class SceneManager
         LoadScene();
     }
 
+    public static void CreateAndLoadNewScene()
+    {
+        LoadScene(new Scene());
+
+        var cameraObject = GameObject.Create();
+        cameraObject.AddComponent<Camera>();
+        cameraObject.name = "Main Camera";
+
+        var lightObject = GameObject.Create();
+        lightObject.AddComponent<DirectionalLight>();
+        lightObject.transform.localEulerAngles = new Vector3(20, 135, 0);
+        lightObject.name = "Directional Light";
+    }
+
     public static void LoadScene(Scene scene) => loadedScene = scene;
     public static void SaveScene() => SceneSerializer.SaveScene("res/scenes/test.scene", loadedScene);
     public static void LoadScene() => SceneSerializer.LoadScene("res/scenes/test.scene");

@@ -28,6 +28,9 @@ public static class FileDialog
     static string newFolderName = string.Empty;
     static string newFolderError = string.Empty;
 
+    static string newFileName = string.Empty;
+    static string newFileError = string.Empty;
+
     public static void Show(ref bool open, ref string resultPath, bool singleFile, Action OnChoose = null)
     {
         // return if it shouldnt be open
@@ -156,10 +159,23 @@ public static class FileDialog
             ImGui.SameLine();
 
             // delete folder button
-            bool canDelete = !string.IsNullOrEmpty(currentFolder);
-            if (!canDelete) ImGui.BeginDisabled();
+            bool canDeleteFolder = !string.IsNullOrEmpty(currentFolder);
+            if (!canDeleteFolder) ImGui.BeginDisabled();
             if (ImGui.Button("Delete folder")) ImGui.OpenPopup("Delete Folder");
-            if (!canDelete) ImGui.EndDisabled();
+            if (!canDeleteFolder) ImGui.EndDisabled();
+
+            ImGui.SameLine();
+
+            // new file button
+            if (ImGui.Button("New file")) ImGui.OpenPopup("Create File");
+
+            ImGui.SameLine();
+
+            // delete file button
+            bool canDeleteFile = !string.IsNullOrEmpty(currentFile);
+            if (!canDeleteFile) ImGui.BeginDisabled();
+            if (ImGui.Button("Delete file")) ImGui.OpenPopup("Delete File");
+            if (!canDeleteFile) ImGui.EndDisabled();
 
             // new folder popup
             if (ImGui.BeginPopupModal("Create Folder", ImGuiWindowFlags.NoResize))
@@ -198,6 +214,43 @@ public static class FileDialog
                 ImGui.EndPopup();
             }
 
+            // new file popup
+            if (ImGui.BeginPopupModal("Create File", ImGuiWindowFlags.NoResize))
+            {
+                ImGui.Text("Name:");
+                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                ImGui.InputText("##filename", ref newFileName, 100);
+
+                // create button
+                if (ImGui.Button("Create"))
+                {
+                    if (string.IsNullOrWhiteSpace(newFileName)) newFileError = "Name cannot be empty";
+                    else
+                    {
+                        var path = Path.Combine(currentPath, newFileName);
+                        File.Create(path);
+                        newFileName = string.Empty;
+                        newFileError = string.Empty;
+                        ImGui.CloseCurrentPopup();
+                    }
+                }
+
+                ImGui.SameLine();
+
+                // cancel button
+                if (ImGui.Button("Cancel"))
+                {
+                    newFileName = string.Empty;
+                    newFileError = string.Empty;
+                    ImGui.CloseCurrentPopup();
+                }
+
+                // deal with file errors
+                if (!string.IsNullOrEmpty(newFileError)) ImGui.TextColored(new Vector4(1, 0, 0, 1), newFileError);
+
+                ImGui.EndPopup();
+            }
+
             // delete folder popup
             if (ImGui.BeginPopupModal("Delete Folder", ImGuiWindowFlags.NoResize))
             {
@@ -209,6 +262,30 @@ public static class FileDialog
                 {
                     Directory.Delete(Path.Combine(currentPath, currentFolder), true);
                     currentFolder = string.Empty;
+                    ImGui.CloseCurrentPopup();
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("No", new(width, 0)))
+                {
+                    ImGui.CloseCurrentPopup();
+                }
+
+                ImGui.EndPopup();
+            }
+
+            // delete file popup
+            if (ImGui.BeginPopupModal("Delete File", ImGuiWindowFlags.NoResize))
+            {
+                ImGui.TextColored(new Vector4(1, 0, 0, 1), $"Are you sure you want to delete '{currentFile}'?");
+                ImGui.Spacing();
+
+                var width = ImGui.GetContentRegionAvail().X / 2 - (ImGui.GetStyle().ItemSpacing.X / 2);
+                if (ImGui.Button("Yes", new(width, 0)))
+                {
+                    File.Delete(Path.Combine(currentPath, currentFile));
+                    currentFile = string.Empty;
                     ImGui.CloseCurrentPopup();
                 }
 

@@ -33,7 +33,7 @@ public static class Engine
         opengl = GL.GetApi(window);
         input = window.CreateInput();
         igcontroller = new ImGuiController(opengl, window, input);
-        SceneManager.LoadScene("res/scenes/test.scene");
+        ProjectManager.LoadProject("example/project.json");
     }
 
     static void UpdateWindow(double deltaTime)

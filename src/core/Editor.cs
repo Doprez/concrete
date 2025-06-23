@@ -37,8 +37,13 @@ public static unsafe class Editor
     private static Type[] allTypes = Assembly.GetExecutingAssembly().GetTypes();
     private static Type[] componentTypes = allTypes.Where(type => type.IsClass && !type.IsAbstract && type != typeof(Transform) && type.IsSubclassOf(typeof(Component))).ToArray();
 
-    private static bool oFileDialogOpen = false;
-    private static bool sFileDialogOpen = false;
+    private static bool openSceneFileDialogOpen = false;
+    private static bool saveSceneFileDialogOpen = false;
+
+    private static bool openProjectFileDialogOpen = false;
+    private static bool saveProjectFileDialogOpen = false;
+    private static bool newProjectFileDialogOpen = false;
+
     private static string fileDialogPath = "";
 
     public static void Update(float deltaTime)
@@ -59,17 +64,39 @@ public static unsafe class Editor
         reparentque.Clear();
 
         // render file dialog if needed
-        if (oFileDialogOpen) FileDialog.Show(ref oFileDialogOpen, ref fileDialogPath, true, () => SceneManager.LoadScene(fileDialogPath));
-        if (sFileDialogOpen) FileDialog.Show(ref sFileDialogOpen, ref fileDialogPath, true, () => SceneManager.SaveScene(fileDialogPath));
+        if (openSceneFileDialogOpen) FileDialog.Show(ref openSceneFileDialogOpen, ref fileDialogPath, true, () => SceneManager.LoadScene(fileDialogPath));
+        if (saveSceneFileDialogOpen) FileDialog.Show(ref saveSceneFileDialogOpen, ref fileDialogPath, true, () => SceneManager.SaveScene(fileDialogPath));
+
+        if (openProjectFileDialogOpen) FileDialog.Show(ref openProjectFileDialogOpen, ref fileDialogPath, true, () => ProjectManager.LoadProject(fileDialogPath));
+        if (saveProjectFileDialogOpen) FileDialog.Show(ref saveProjectFileDialogOpen, ref fileDialogPath, true, () => ProjectManager.SaveProject(fileDialogPath));
+        if (newProjectFileDialogOpen) FileDialog.Show(ref newProjectFileDialogOpen, ref fileDialogPath, true, () => ProjectManager.CreateAndLoadNewProject(fileDialogPath));
 
         // begin main menu bar
         if (ImGui.BeginMainMenuBar())
         {
-            // scene menu
-            if (ImGui.BeginMenu("File"))
+            // project menu
+            if (ImGui.BeginMenu("Project"))
             {
-                if (ImGui.MenuItem("Open")) oFileDialogOpen = true;
-                if (ImGui.MenuItem("Save")) sFileDialogOpen = true;
+                if (ImGui.MenuItem("New")) newProjectFileDialogOpen = true;
+
+                ImGui.BeginDisabled(ProjectManager.loadedProjectData == null);
+                if (ImGui.MenuItem("Save")) saveProjectFileDialogOpen = true;
+                ImGui.EndDisabled();
+                
+                if (ImGui.MenuItem("Open")) openProjectFileDialogOpen = true;
+                ImGui.EndMenu();
+            }
+
+            // scene menu
+            if (ImGui.BeginMenu("Scene"))
+            {
+                if (ImGui.MenuItem("New")) SceneManager.CreateAndLoadNewScene();
+
+                ImGui.BeginDisabled(SceneManager.loadedScene == null);
+                if (ImGui.MenuItem("Save")) saveSceneFileDialogOpen = true;
+                ImGui.EndDisabled();
+
+                if (ImGui.MenuItem("Open")) openSceneFileDialogOpen = true;
                 ImGui.EndMenu();
             }
 
