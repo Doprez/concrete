@@ -20,11 +20,14 @@ public class MeshRenderer : Component
         {
             currentModelPath = value;
 
+            // calc global model path
+            string fullModelPath = Path.Combine(Path.GetDirectoryName(ProjectManager.loadedProjectFilePath), currentModelPath);
+
             // extract all meshes
-            meshes = ModelReader.GetMeshes(currentModelPath);
+            meshes = ModelReader.GetMeshes(fullModelPath);
 
             // create instance for animation
-            instance = SceneTemplate.Create(ModelRoot.Load(currentModelPath).DefaultScene).CreateInstance();
+            instance = SceneTemplate.Create(ModelRoot.Load(fullModelPath).DefaultScene).CreateInstance();
 
             // check if mesh is skinned
             if (instance.GetDrawableInstance(0).Transform is SkinnedTransform) skinned = true;
