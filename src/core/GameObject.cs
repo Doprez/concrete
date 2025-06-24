@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace Concrete;
 
-public class GameObject
+public class GameObject : IDisposable
 {
     [Include] public int id;
     [Include] public string name;
@@ -14,6 +14,11 @@ public class GameObject
     public GameObject()
     {
         // do nothing
+    }
+
+    public void Dispose()
+    {
+        foreach (var component in components) component.Dispose();
     }
 
     public static GameObject Create()
@@ -47,7 +52,7 @@ public class GameObject
     public void RemoveComponent(Component component)
     {
         components.Remove(component);
-        component = null;
+        component.Dispose();
     }
 
     public Component AddComponentOfType(Type type)

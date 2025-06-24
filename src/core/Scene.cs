@@ -2,13 +2,18 @@ using System.Numerics;
 
 namespace Concrete;
 
-public class Scene
+public class Scene : IDisposable
 {
     [Include] public List<GameObject> gameObjects = [];
 
     public Scene()
     {
         // do nothing
+    }
+
+    public void Dispose()
+    {
+        foreach (var gameObject in gameObjects) gameObject.Dispose();
     }
 
     public List<Light> FindActiveLights()
@@ -55,7 +60,7 @@ public class Scene
     public void RemoveGameObject(GameObject gameObject)
     {
         gameObjects.Remove(gameObject);
-        gameObject = null;
+        gameObject.Dispose();
     }
 
     public void Start()

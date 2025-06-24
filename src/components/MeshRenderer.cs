@@ -47,7 +47,7 @@ public class MeshRenderer : Component
         shader.SetMatrix4("proj", proj);
 
         // set lights
-        shader.SetLights(SceneManager.loadedScene.FindActiveLights());
+        shader.SetLights(LightRegistry.registered);
 
         // set skin
         if (skinned)

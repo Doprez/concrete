@@ -59,11 +59,13 @@ public static class SceneManager
 
     public static void LoadScene(Scene scene)
     {
+        loadedScene?.Dispose();
         loadedScene = scene;
     }
 
     public static void LoadScene(string path)
     {
+        loadedScene?.Dispose();
         loadedScene = SceneSerializer.LoadScene(path);
     }
 

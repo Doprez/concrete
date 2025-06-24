@@ -6,6 +6,16 @@ public abstract class Light : Component
 {
     [Include] [Show] public float brightness = 1;
     [Include] [Show] public Vector3 color = Vector3.One;
+
+    public Light()
+    {
+        LightRegistry.registered.Add(this);
+    }
+
+    public override void Dispose()
+    {
+        LightRegistry.registered.Remove(this);
+    }
 }
 
 public class PointLight : Light
