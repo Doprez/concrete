@@ -24,7 +24,7 @@ public static class ProjectManager
         {
             // load default scene
             string projectRoot = Path.GetDirectoryName(path);
-            string scenePath = Path.Combine(projectRoot, loadedProjectData.firstScene);
+            string scenePath = projectRoot + "/" + loadedProjectData.firstScene;
             SceneManager.LoadScene(scenePath);
         }
         else

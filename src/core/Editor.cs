@@ -371,6 +371,14 @@ public static unsafe class Editor
             ImPlot.EndPlot();
         }
 
+        // Status Bar
+        var flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar;
+        if (ImGui.BeginViewportSideBar("StatusBar", ImGui.GetMainViewport(), ImGuiDir.Down, 30, flags))
+        {
+            ImGui.Text(Path.GetFullPath(ProjectManager.loadedProjectFilePath));
+        }
+        ImGui.End();
+
         ImGui.End();
     }
 

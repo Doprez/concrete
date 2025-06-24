@@ -7,10 +7,14 @@ public static class SceneManager
 {
     public static Scene loadedScene = null;
     public static PlayState playState = PlayState.stopped;
+    public static string cachePath = "cache.scene";
 
     public static void StartPlaying()
     {
-        SaveScene();
+        // store cache
+        if (File.Exists(cachePath)) File.Delete(cachePath);
+        SaveScene(cachePath);
+
         StartSceneObjects();
         playState = PlayState.playing;
     }
@@ -28,7 +32,10 @@ public static class SceneManager
     public static void StopPlaying()
     {
         playState = PlayState.stopped;
-        LoadScene();
+        
+        // load cache
+        LoadScene(cachePath);
+        if (File.Exists(cachePath)) File.Delete(cachePath);
     }
 
     public static void CreateAndLoadNewScene()
@@ -45,11 +52,20 @@ public static class SceneManager
         lightObject.name = "Directional Light";
     }
 
-    public static void LoadScene(Scene scene) => loadedScene = scene;
-    public static void SaveScene() => SceneSerializer.SaveScene("res/scenes/test.scene", loadedScene);
-    public static void LoadScene() => SceneSerializer.LoadScene("res/scenes/test.scene");
-    public static void SaveScene(string path) => SceneSerializer.SaveScene(path, loadedScene);
-    public static void LoadScene(string path) => loadedScene = SceneSerializer.LoadScene(path);
+    public static void SaveScene(string path)
+    {
+        SceneSerializer.SaveScene(path, loadedScene);
+    }
+
+    public static void LoadScene(Scene scene)
+    {
+        loadedScene = scene;
+    }
+
+    public static void LoadScene(string path)
+    {
+        loadedScene = SceneSerializer.LoadScene(path);
+    }
 
     public static void StartSceneObjects() => loadedScene?.Start();
     public static void UpdateSceneObjects(float deltaTime) => loadedScene?.Update(deltaTime);
