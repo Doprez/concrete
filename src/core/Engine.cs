@@ -17,8 +17,8 @@ public static class Engine
     static void Main()
     {
         var options = WindowOptions.Default;
-        options.Size = new Vector2D<int>(1280, 720);
-        options.Title = "Concrete";
+        options.Size = new(1280, 720);
+        options.Title = "Concrete Engine";
         window = Window.Create(options);
         window.Load += StartWindow;
         window.Update += UpdateWindow;

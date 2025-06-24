@@ -371,18 +371,6 @@ public static unsafe class Editor
             ImPlot.EndPlot();
         }
 
-        // statusbar
-        float statusBarHeight = 22;
-        float statusBarPadding = (statusBarHeight - ImGui.GetFontSize()) / 2f;
-        ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(8, statusBarPadding));
-        var flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoTitleBar;
-        if (ImGui.BeginViewportSideBar("StatusBar", ImGui.GetMainViewport(), ImGuiDir.Down, statusBarHeight, flags))
-        {
-            ImGui.Text(Path.GetFullPath(ProjectManager.loadedProjectFilePath));
-        }
-        ImGui.End();
-        ImGui.PopStyleVar();
-
         ImGui.End();
     }
 

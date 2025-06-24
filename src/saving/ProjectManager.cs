@@ -19,6 +19,7 @@ public static class ProjectManager
         // load project
         loadedProjectFilePath = path;
         loadedProjectData = ProjectSerializer.LoadProject(path);
+        Engine.window.Title = "Concrete Engine [" + Path.GetFullPath(loadedProjectFilePath) + "]";
 
         if (loadedProjectData.firstScene != "")
         {
