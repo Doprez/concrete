@@ -113,16 +113,22 @@ public static unsafe class Editor
         int dockspace = ImGui.DockSpaceOverViewport((ImGuiDockNodeFlags)ImGuiDockNodeFlagsPrivate.NoWindowMenuButton);
         if (!dockbuilderInitialized)
         {
-            int leftdock, rightdock = 0;
-            int bottomleftdock, topleftdock = 0;
-            ImGui.DockBuilderSplitNode(dockspace, ImGuiDir.Left, 0.25f, &leftdock, &rightdock);
-            ImGui.DockBuilderSplitNode(leftdock, ImGuiDir.Up, 0.5f, &topleftdock, &bottomleftdock);
+            int left, mid, right;
+            int topleft, lowleft;
+            int topmid, lowmid;
 
-            ImGui.DockBuilderDockWindow("Scene", rightdock);
-            ImGui.DockBuilderDockWindow("Game", rightdock);
-            ImGui.DockBuilderDockWindow("Hierarchy", bottomleftdock);
-            ImGui.DockBuilderDockWindow("Inspector", topleftdock);
-            ImGui.DockBuilderDockWindow("Metrics", topleftdock);
+            ImGui.DockBuilderSplitNode(dockspace, ImGuiDir.Left, 0.25f, &left, &mid);
+            ImGui.DockBuilderSplitNode(mid, ImGuiDir.Left, 0.66f, &mid, &right);
+            ImGui.DockBuilderSplitNode(left, ImGuiDir.Up, 0.5f, &topleft, &lowleft);
+            ImGui.DockBuilderSplitNode(mid, ImGuiDir.Down, 0.3f, &lowmid, &topmid);
+
+            ImGui.DockBuilderDockWindow("Scene", topmid);
+            ImGui.DockBuilderDockWindow("Game", topmid);
+            ImGui.DockBuilderDockWindow("Metrics", topmid);
+            ImGui.DockBuilderDockWindow("Hierarchy", topleft);
+            ImGui.DockBuilderDockWindow("Files", lowleft);
+            ImGui.DockBuilderDockWindow("Inspector", right);
+            ImGui.DockBuilderDockWindow("Console", lowmid);
 
             ImGui.DockBuilderFinish(dockspace);
             dockbuilderInitialized = true;
@@ -284,6 +290,14 @@ public static unsafe class Editor
             }
             ImGui.EndDragDropTarget();
         }
+        ImGui.End();
+
+        ImGui.Begin("Files");
+        ImGui.Text("test");
+        ImGui.End();
+
+        ImGui.Begin("Console");
+        ImGui.Text("test");
         ImGui.End();
 
         ImGui.Begin("Inspector");

@@ -17,7 +17,7 @@ public static class Engine
     static void Main()
     {
         var options = WindowOptions.Default;
-        options.Size = new(1280, 720);
+        options.Size = new(1600, 900);
         options.Title = "Concrete Engine";
         window = Window.Create(options);
         window.Load += StartWindow;
