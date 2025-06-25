@@ -376,7 +376,13 @@ public static unsafe class Editor
         ImGui.End();
 
         ImGui.Begin("Console");
-        ImGui.Text("test");
+
+        if (ImGui.Button("test")) Debug.Log("test");
+        if (ImGui.Button("clear")) Debug.Clear();
+
+        List<string> history = Debug.history;
+        foreach (var line in history) ImGui.Text(line);
+
         ImGui.End();
 
         ImGui.Begin("Inspector");
