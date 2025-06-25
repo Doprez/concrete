@@ -19,6 +19,8 @@ public static unsafe class Editor
         set => selectedGameObjectIdentifier = value.id;
     }
 
+    private static string selectedFileOrDir = null;
+
     public static SceneCamera sceneCamera = new();
     public static Framebuffer scene_fb = new();
     public static Framebuffer game_fb = new();
@@ -266,14 +268,12 @@ public static unsafe class Editor
 
         ImGui.Begin("Hierarchy");
 
-        var hspace = ImGui.GetContentRegionAvail().X;
-        var hwidth = hspace / 2 - ImGui.GetStyle().ItemSpacing.X / 2;
-        var hsize = new Vector2(hwidth, 0);
+        var hbuttonsize = new Vector2(ImGui.GetContentRegionAvail().X / 2 - ImGui.GetStyle().ItemSpacing.X / 2, 0);
 
-        if (ImGui.Button("Create", hsize)) GameObject.Create();
+        if (ImGui.Button("Create", hbuttonsize)) GameObject.Create();
         ImGui.SameLine();
         ImGui.BeginDisabled(selectedGameObject == null);
-        if (ImGui.Button("Delete", hsize)) SceneManager.loadedScene.RemoveGameObject(selectedGameObject);
+        if (ImGui.Button("Delete", hbuttonsize)) SceneManager.loadedScene.RemoveGameObject(selectedGameObject);
         ImGui.EndDisabled();
 
         ImGui.Separator();
@@ -293,7 +293,86 @@ public static unsafe class Editor
         ImGui.End();
 
         ImGui.Begin("Files");
-        ImGui.Text("test");
+
+        if (ProjectManager.loadedProjectFilePath != null)
+        {
+            string root = Path.GetDirectoryName(ProjectManager.loadedProjectFilePath);
+
+            var fbuttonsize = new Vector2(ImGui.GetContentRegionAvail().X / 2 - ImGui.GetStyle().ItemSpacing.X / 2, 0);
+
+            ImGui.BeginDisabled(File.Exists(selectedFileOrDir)); // cant make a folder inside a file
+            if (ImGui.Button("New Folder", fbuttonsize))
+            {
+                // make folder in root if no dir is selected
+                string parentfolder = Directory.Exists(selectedFileOrDir) ? selectedFileOrDir : root;
+                string newfolderpath = parentfolder + "/folder";
+
+                // add number if folder name is already in use
+                for (int i = 0; i < 20; i++)
+                {
+                    if (Directory.Exists(newfolderpath)) newfolderpath = parentfolder + "/folder (" + i.ToString() + ")";
+                    else break;
+                }
+                
+                // create the folder
+                Directory.CreateDirectory(newfolderpath);
+            }
+            ImGui.EndDisabled();
+
+            ImGui.SameLine();
+
+            ImGui.BeginDisabled(selectedFileOrDir == null);
+            if (ImGui.Button("Delete", fbuttonsize))
+            {
+                if (Directory.Exists(selectedFileOrDir)) Directory.Delete(selectedFileOrDir, true);
+                else File.Delete(selectedFileOrDir);
+                selectedFileOrDir = null;
+            }
+            ImGui.EndDisabled();
+
+            ImGui.Separator();
+
+            RenderDirectoryInsides(root);
+
+            void RenderFile(string path)
+            {
+                var fileflags = ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen;
+                if (selectedFileOrDir == path) fileflags |= ImGuiTreeNodeFlags.Selected;
+
+                string filename = Path.GetFileName(path);
+                ImGui.TreeNodeEx(filename, fileflags);
+                if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0)) selectedFileOrDir = path;
+            }
+
+            void RenderDirectoryAndInsides(string path)
+            {
+                ImGui.PushID(path);
+
+                var dirflags = ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.OpenOnArrow;
+                if (selectedFileOrDir == path) dirflags |= ImGuiTreeNodeFlags.Selected;
+
+                string relative = Path.GetRelativePath(root, path).Replace("\\", "/");
+
+                if (ImGui.TreeNodeEx(relative + "/", dirflags))
+                {
+                    if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0)) selectedFileOrDir = path;
+                    RenderDirectoryInsides(path);
+                    ImGui.TreePop();
+                }
+
+                ImGui.PopID();
+            }
+
+            void RenderDirectoryInsides(string currentPath)
+            {
+                string[] dirs = Directory.GetDirectories(currentPath);
+                for (int i = 0; i < dirs.Length; i++) RenderDirectoryAndInsides(dirs[i]);
+
+                string[] files = Directory.GetFiles(currentPath);
+                for (int i = 0; i < files.Length; i++) RenderFile(files[i]);
+            }
+        }
+
         ImGui.End();
 
         ImGui.Begin("Console");
