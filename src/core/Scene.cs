@@ -50,10 +50,10 @@ public class Scene : IDisposable
         return null;
     }
 
-    public GameObject FindGameObject(int id)
+    public GameObject FindGameObject(Guid guid)
     {
         GameObject result = null;
-        foreach (var gameObject in gameObjects) if (gameObject.id == id) result = gameObject;
+        foreach (var gameObject in gameObjects) if (gameObject.guid == guid) result = gameObject;
         return result;
     }
 

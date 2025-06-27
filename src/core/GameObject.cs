@@ -5,7 +5,7 @@ namespace Concrete;
 
 public class GameObject : IDisposable
 {
-    [Include] public int id;
+    [Include] public Guid guid;
     [Include] public string name;
     [Include] public bool enabled;
     [Include] public Transform transform;
@@ -26,19 +26,11 @@ public class GameObject : IDisposable
         var scene = SceneManager.loadedScene;
         var gameObject = new GameObject();
         gameObject.transform = gameObject.AddComponent<Transform>();
-        gameObject.id = gameObject.GenerateID();
+        gameObject.guid = Guid.NewGuid();
         gameObject.name = $"GameObject ({scene.gameObjects.Count})";
         gameObject.enabled = true;
         scene.gameObjects.Add(gameObject);
         return gameObject;
-    }
-
-    public int GenerateID()
-    {
-        var random = new Random();
-        string digits = "";
-        for (int i = 0; i < 8; i++) digits += random.Next(0, 10).ToString();
-        return int.Parse(digits);
     }
 
     public T AddComponent<T>() where T : Component, new()

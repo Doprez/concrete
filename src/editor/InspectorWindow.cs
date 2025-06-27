@@ -21,7 +21,7 @@ public static unsafe class InspectorWindow
         ImGui.Begin("Inspector");
         if (HierarchyWindow.selectedGameObject != null)
         {
-            ImGui.PushID(HierarchyWindow.selectedGameObject.id);
+            ImGui.PushID(HierarchyWindow.selectedGameObject.guid.ToString());
 
             // enabled and name
             ImGui.Checkbox("##first", ref HierarchyWindow.selectedGameObject.enabled);

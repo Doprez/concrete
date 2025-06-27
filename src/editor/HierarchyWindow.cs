@@ -12,11 +12,11 @@ namespace Concrete;
 
 public static unsafe class HierarchyWindow
 {
-    private static int selectedGameObjectIdentifier;
+    private static Guid selectedGameObjectIdentifier;
     public static GameObject selectedGameObject
     {
         get => SceneManager.loadedScene.FindGameObject(selectedGameObjectIdentifier);
-        set => selectedGameObjectIdentifier = value.id;
+        set => selectedGameObjectIdentifier = value.guid;
     }
 
     private static List<(GameObject, GameObject)> reparentque = [];
@@ -53,7 +53,7 @@ public static unsafe class HierarchyWindow
             var payload = ImGui.AcceptDragDropPayload(nameof(GameObject));
             if (!payload.IsNull)
             {
-                var dragged = SceneManager.loadedScene.FindGameObject(*(int*)payload.Data);
+                var dragged = SceneManager.loadedScene.FindGameObject(*(Guid*)payload.Data);
                 if (dragged != null) reparentque.Add((dragged, null));
             }
             ImGui.EndDragDropTarget();
@@ -63,8 +63,8 @@ public static unsafe class HierarchyWindow
 
     private static void DrawHierarchyMember(GameObject gameObject)
     {
-        int id = gameObject.id;
-        ImGui.PushID(id);
+        Guid id = gameObject.guid;
+        ImGui.PushID(id.ToString());
 
         var flags = ImGuiTreeNodeFlags.OpenOnArrow;
         if (gameObject.transform.children.Count == 0) flags |= ImGuiTreeNodeFlags.Leaf;
@@ -74,7 +74,7 @@ public static unsafe class HierarchyWindow
 
         if (ImGui.BeginDragDropSource())
         {
-            ImGui.SetDragDropPayload(nameof(GameObject), &id, sizeof(int));
+            ImGui.SetDragDropPayload(nameof(GameObject), &id, (nuint)sizeof(Guid));
             ImGui.Text(gameObject.name);
             ImGui.EndDragDropSource();
         }
@@ -84,7 +84,7 @@ public static unsafe class HierarchyWindow
             var payload = ImGui.AcceptDragDropPayload(nameof(GameObject));
             if (!payload.IsNull)
             {
-                var dragged = SceneManager.loadedScene.FindGameObject(*(int*)payload.Data);
+                var dragged = SceneManager.loadedScene.FindGameObject(*(Guid*)payload.Data);
                 if (dragged != null && !dragged.transform.children.Contains(gameObject.transform)) reparentque.Add((dragged, gameObject));
             }
             ImGui.EndDragDropTarget();
