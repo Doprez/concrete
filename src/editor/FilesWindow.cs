@@ -21,12 +21,26 @@ public static unsafe class FilesWindow
     {
         foreach (var tuple in movequeue)
         {
-            string file = tuple.file;
-            string dest = tuple.dest;
-            string moved = Path.Combine(dest, Path.GetFileName(file));
-            if (file == moved) continue;
-            if (File.Exists(file)) File.Move(file, moved);
-            if (Directory.Exists(file)) Directory.Move(file, moved);
+            string file_path = tuple.file;
+            string dest_path = tuple.dest;
+            string file_path_moved = Path.Combine(dest_path, Path.GetFileName(file_path));
+
+            if (file_path == file_path_moved) continue;
+
+            if (File.Exists(file_path))
+            {
+                string file_path_short = Path.GetFileName(file_path);
+                string file_extension = Path.GetExtension(file_path_short);
+                string file_basename = Path.GetFileNameWithoutExtension(file_path_short);
+
+                string guid_path_short = file_basename + ".guid";
+                string guid_path = Path.Combine(Directory.GetParent(file_path).FullName, guid_path_short);
+                string guid_path_moved = Path.Combine(dest_path, guid_path_short);
+
+                File.Move(file_path, file_path_moved); // move asset file
+                if (File.Exists(guid_path)) File.Move(guid_path, guid_path_moved); // move guid file
+            }
+            else if (Directory.Exists(file_path)) Directory.Move(file_path, file_path_moved);
         }
         movequeue.Clear();
 
