@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Text;
 
 using Hexa.NET.ImGui;
 using Hexa.NET.ImGuizmo;
@@ -14,8 +15,21 @@ public static unsafe class FilesWindow
 {
     private static string selectedFileOrDir = null;
 
+    static List<(string file, string dest)> movequeue = [];
+
     public static void Draw(float deltaTime)
     {
+        foreach (var tuple in movequeue)
+        {
+            string file = tuple.file;
+            string dest = tuple.dest;
+            string moved = Path.Combine(dest, Path.GetFileName(file));
+            if (file == moved) continue;
+            if (File.Exists(file)) File.Move(file, moved);
+            if (Directory.Exists(file)) Directory.Move(file, moved);
+        }
+        movequeue.Clear();
+
         ImGui.Begin("Files");
 
         if (ProjectManager.loadedProjectFilePath != null)
@@ -63,9 +77,20 @@ public static unsafe class FilesWindow
                 var fileflags = ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen;
                 if (selectedFileOrDir == path) fileflags |= ImGuiTreeNodeFlags.Selected;
 
-                string filename = Path.GetFileName(path);
-                ImGui.TreeNodeEx(filename, fileflags);
+                string endname = Path.GetFileName(path);
+                ImGui.PushID(path);
+                ImGui.TreeNodeEx(endname, fileflags);
                 if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0)) selectedFileOrDir = path;
+
+                if (ImGui.BeginDragDropSource())
+                {
+                    byte[] payload = Encoding.UTF8.GetBytes(path);
+                    fixed (byte* ptr = payload) ImGui.SetDragDropPayload("payload1", ptr, (nuint)payload.Length);
+                    ImGui.Text(endname);
+                    ImGui.EndDragDropSource();
+                }
+
+                ImGui.PopID();
             }
 
             void RenderDirectoryAndInsides(string path)
@@ -76,8 +101,31 @@ public static unsafe class FilesWindow
                 if (selectedFileOrDir == path) dirflags |= ImGuiTreeNodeFlags.Selected;
 
                 string relative = Path.GetRelativePath(root, path).Replace("\\", "/");
+                string endname = Path.GetFileName(path);
 
-                if (ImGui.TreeNodeEx(relative + "/", dirflags))
+                bool open = ImGui.TreeNodeEx(endname, dirflags);
+                if (ImGui.IsItemClicked()) selectedFileOrDir = path;
+
+                if (ImGui.BeginDragDropSource())
+                {
+                    byte[] payload = Encoding.UTF8.GetBytes(path);
+                    fixed (byte* ptr = payload) ImGui.SetDragDropPayload("payload1", ptr, (nuint)payload.Length);
+                    ImGui.Text(endname);
+                    ImGui.EndDragDropSource();
+                }
+
+                if (ImGui.BeginDragDropTarget())
+                {
+                    var payload = ImGui.AcceptDragDropPayload("payload1");
+                    if (!payload.IsNull)
+                    {
+                        string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
+                        movequeue.Add((file, path));
+                    }
+                    ImGui.EndDragDropTarget();
+                }
+
+                if (open)
                 {
                     if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0)) selectedFileOrDir = path;
                     RenderDirectoryInsides(path);

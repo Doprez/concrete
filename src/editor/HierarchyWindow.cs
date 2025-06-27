@@ -50,7 +50,7 @@ public static unsafe class HierarchyWindow
         ImGui.InvisibleButton("", ImGui.GetContentRegionAvail());
         if (ImGui.BeginDragDropTarget())
         {
-            var payload = ImGui.AcceptDragDropPayload(nameof(GameObject));
+            var payload = ImGui.AcceptDragDropPayload("payload2");
             if (!payload.IsNull)
             {
                 var dragged = SceneManager.loadedScene.FindGameObject(*(Guid*)payload.Data);
@@ -74,14 +74,14 @@ public static unsafe class HierarchyWindow
 
         if (ImGui.BeginDragDropSource())
         {
-            ImGui.SetDragDropPayload(nameof(GameObject), &id, (nuint)sizeof(Guid));
+            ImGui.SetDragDropPayload("payload2", &id, (nuint)sizeof(Guid));
             ImGui.Text(gameObject.name);
             ImGui.EndDragDropSource();
         }
         
         if (ImGui.BeginDragDropTarget())
         {
-            var payload = ImGui.AcceptDragDropPayload(nameof(GameObject));
+            var payload = ImGui.AcceptDragDropPayload("payload2");
             if (!payload.IsNull)
             {
                 var dragged = SceneManager.loadedScene.FindGameObject(*(Guid*)payload.Data);
