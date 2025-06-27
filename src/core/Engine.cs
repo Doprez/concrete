@@ -40,7 +40,6 @@ public static class Engine
     {
         Metrics.Update((float)deltaTime);
         if (SceneManager.playState == PlayState.playing) SceneManager.UpdateSceneObjects((float)deltaTime);
-        Editor.Update((float)deltaTime);
         igcontroller.Update((float)deltaTime);
     }
 
