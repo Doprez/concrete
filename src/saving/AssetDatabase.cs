@@ -12,6 +12,27 @@ public static class AssetDatabase
 
     private static string[] includes = [".scene", ".glb"];
 
+    public static string GuidPathFromAssetPath(string asset_path)
+    {
+        string asset_basename = Path.GetFileNameWithoutExtension(asset_path);
+        string guid_path = Path.Combine(Path.GetDirectoryName(asset_path), asset_basename + ".guid");
+        return guid_path;
+    }
+
+    public static string AssetPathFromGuidPath(string guid_path)
+    {
+        string guid_basename = Path.GetFileNameWithoutExtension(guid_path);
+        string asset_parent_path = Path.GetDirectoryName(guid_path);
+
+        foreach (var include in includes)
+        {
+            string attempt = Path.Combine(asset_parent_path, guid_basename + include);
+            if (File.Exists(attempt)) return attempt;
+        }
+
+        return null;
+    }
+
     // scans for missing guids and rebuilds them
     public static void Initialize(string root)
     {

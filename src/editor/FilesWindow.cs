@@ -15,32 +15,48 @@ public static unsafe class FilesWindow
 {
     private static string selectedFileOrDir = null;
 
-    static List<(string file, string dest)> movequeue = [];
+    static List<(string item, string dest)> movequeue = [];
 
     public static void Draw(float deltaTime)
     {
         foreach (var tuple in movequeue)
         {
-            string file_path = tuple.file;
+            string item_path = tuple.item;
             string dest_path = tuple.dest;
-            string file_path_moved = Path.Combine(dest_path, Path.GetFileName(file_path));
+            string item_path_moved = Path.Combine(dest_path, Path.GetFileName(item_path));
 
-            if (file_path == file_path_moved) continue;
+            if (item_path == item_path_moved) continue;
 
-            if (File.Exists(file_path))
+            // item is file
+            if (File.Exists(item_path))
             {
-                string file_path_short = Path.GetFileName(file_path);
-                string file_extension = Path.GetExtension(file_path_short);
-                string file_basename = Path.GetFileNameWithoutExtension(file_path_short);
+                string extension = Path.GetExtension(item_path);
 
-                string guid_path_short = file_basename + ".guid";
-                string guid_path = Path.Combine(Directory.GetParent(file_path).FullName, guid_path_short);
-                string guid_path_moved = Path.Combine(dest_path, guid_path_short);
+                // if file is asset
+                if (extension != ".guid")
+                {
+                    string guid_path = AssetDatabase.GuidPathFromAssetPath(item_path);
+                    string guid_path_moved = Path.Combine(dest_path, Path.GetFileName(guid_path));
+                    File.Move(item_path, item_path_moved); // move asset file
+                    if (File.Exists(guid_path)) File.Move(guid_path, guid_path_moved); // move guid file
+                }
 
-                File.Move(file_path, file_path_moved); // move asset file
-                if (File.Exists(guid_path)) File.Move(guid_path, guid_path_moved); // move guid file
+                // if file is guid
+                if (extension == ".guid")
+                {
+                    string asset_path = AssetDatabase.AssetPathFromGuidPath(item_path);
+                    string asset_path_moved = Path.Combine(dest_path, Path.GetFileName(asset_path));
+
+                    File.Move(item_path, item_path_moved); // move guid file
+                    if (File.Exists(asset_path)) File.Move(asset_path, asset_path_moved); // move asset file
+                }
             }
-            else if (Directory.Exists(file_path)) Directory.Move(file_path, file_path_moved);
+
+            // item is directory
+            if (Directory.Exists(item_path))
+            {
+                Directory.Move(item_path, item_path_moved);
+            }
         }
         movequeue.Clear();
 
