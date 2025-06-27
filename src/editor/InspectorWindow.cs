@@ -137,6 +137,12 @@ public static unsafe class InspectorWindow
             bool value = (bool)curvalue;
             if (ImGui.Checkbox(name, ref value)) field.SetValue(component, value);
         }
+        else if (type == typeof(Guid))
+        {
+            Guid value = (Guid)curvalue;
+            string str = value.ToString();
+            ImGui.InputText(name, ref str, 100, ImGuiInputTextFlags.ReadOnly);
+        }
     }
 
     private static void DrawProperty(PropertyInfo property, Component component)
@@ -184,6 +190,12 @@ public static unsafe class InspectorWindow
         {
             bool value = (bool)curvalue;
             if (ImGui.Checkbox(name, ref value)) property.SetValue(component, value);
+        }
+        else if (type == typeof(Guid))
+        {
+            Guid value = (Guid)curvalue;
+            string str = value.ToString();
+            ImGui.InputText(name, ref str, 100, ImGuiInputTextFlags.ReadOnly);
         }
     }
 }
