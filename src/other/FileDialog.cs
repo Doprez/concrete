@@ -47,7 +47,7 @@ public static class FileDialog
 
         // setup the imgui window
         string title = singleFile ? "Select a file" : "Select a folder";
-        ImGui.SetNextWindowSize(new Vector2(740, 410), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSize(new Vector2(860, 500), ImGuiCond.FirstUseEver);
         if (ImGui.Begin(title, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse))
         {
             // read the directory
@@ -58,8 +58,14 @@ public static class FileDialog
             // display current path
             ImGui.Text(currentPath);
 
+            var available = ImGui.GetContentRegionAvail();
+            float folderPanelWidth = 200f;
+            float buttonHeight = ImGui.GetFontSize() + ImGui.GetStyle().FramePadding.Y * 2 + ImGui.GetStyle().ItemSpacing.Y * 2;
+            float offsetHeight = buttonHeight * 2;
+            float panelHeight = available.Y - offsetHeight;
+
             // folder panel
-            ImGui.BeginChild("Folders", new Vector2(200, 300), ImGuiWindowFlags.HorizontalScrollbar);
+            ImGui.BeginChild("Folders", new Vector2(folderPanelWidth, panelHeight), ImGuiWindowFlags.HorizontalScrollbar);
 
             // button to go up a directory
             if (ImGui.Selectable("..", false, ImGuiSelectableFlags.AllowDoubleClick))
@@ -97,7 +103,8 @@ public static class FileDialog
             ImGui.SameLine();
 
             // file panel
-            ImGui.BeginChild("Files", new Vector2(516, 300), ImGuiWindowFlags.HorizontalScrollbar);
+            float filePanelWidth = available.X - folderPanelWidth - ImGui.GetStyle().ItemSpacing.X;
+            ImGui.BeginChild("Files", new Vector2(filePanelWidth, panelHeight), ImGuiWindowFlags.HorizontalScrollbar);
 
             // row of sorting buttons
             ImGui.Columns(4);
@@ -148,8 +155,9 @@ public static class FileDialog
 
             // display selected path
             string selectedPath = Path.Combine(currentPath, !string.IsNullOrEmpty(currentFolder) ? currentFolder : currentFile);
-            ImGui.PushItemWidth(724);
+            ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X);
             ImGui.InputText("##selected", ref selectedPath, 512, ImGuiInputTextFlags.ReadOnly);
+            ImGui.PopItemWidth();
 
             ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 6);
 
@@ -300,10 +308,10 @@ public static class FileDialog
             }
 
             ImGui.SameLine();
-            ImGui.SetCursorPosX(ImGui.GetWindowWidth() - 120);
 
             // cancel dialog button
-            if (ImGui.Button("Cancel"))
+            ImGui.SetCursorPosX(available.X - 200);
+            if (ImGui.Button("Cancel", new Vector2(100, 0)))
             {
                 Reset();
                 open = false;
@@ -312,7 +320,7 @@ public static class FileDialog
             ImGui.SameLine();
 
             // choose selected file or folder button
-            if (ImGui.Button("Choose"))
+            if (ImGui.Button("Choose", new Vector2(100, 0)))
             {
                 if (!singleFile && string.IsNullOrEmpty(currentFolder)) fileDialogError = "You must select a folder!";
                 else if (singleFile && string.IsNullOrEmpty(currentFile)) fileDialogError = "You must select a file!";
@@ -341,6 +349,7 @@ public static class FileDialog
         currentFolder = string.Empty;
         fileDialogError = string.Empty;
         newFolderError = string.Empty;
+        newFileError = string.Empty;
         initialPathSet = false;
     }
 
