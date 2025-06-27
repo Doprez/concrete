@@ -33,6 +33,10 @@ public static class ProjectManager
             // load empty scene
             SceneManager.CreateAndLoadNewScene();
         }
+
+        // initialize asset database
+        string root = Directory.GetParent(Path.GetFullPath(loadedProjectFilePath)).FullName;
+        AssetDatabase.Initialize(root);
     }
 
     public static void CreateAndLoadNewProject(string path)

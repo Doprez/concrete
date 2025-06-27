@@ -10,7 +10,7 @@ public static class AssetDatabase
     private static Dictionary<Guid, string> GuidToPathMap = [];
     private static Dictionary<string, Guid> PathToGuidMap = [];
 
-    private static string[] include = [".scene", ".glb"];
+    private static string[] includes = [".scene", ".glb"];
 
     // scans for missing guids and rebuilds them
     public static void Initialize(string root)
@@ -21,13 +21,13 @@ public static class AssetDatabase
 
         // find assets
         List<string> temp = [];
-        foreach (string ext in include) temp.AddRange(Directory.GetFiles(root, $"*{ext}", SearchOption.AllDirectories));
+        foreach (string include in includes) temp.AddRange(Directory.GetFiles(root, $"*{include}", SearchOption.AllDirectories));
         string[] assetfiles = temp.ToArray();
         
         // ensure every asset file has a guid file
         foreach (string assetpath in assetfiles)
         {
-            string guidpath = assetpath + ".guid";
+            string guidpath = Path.ChangeExtension(assetpath, ".guid");
 
             // if guid file doesnt exist make a new one
             if (!File.Exists(guidpath)) File.WriteAllText(guidpath, Guid.NewGuid().ToString());
@@ -37,11 +37,20 @@ public static class AssetDatabase
         string[] guidfiles = Directory.GetFiles(root, "*.guid", SearchOption.AllDirectories);
         foreach (string guidpath in guidfiles)
         {
-            // remove .guid extension
-            string assetpath = guidpath.Substring(0, guidpath.Length - 5);
+            // find correct asset file
+            string assetpath = null;
+            foreach (var ext in includes)
+            {
+                var candidate = Path.ChangeExtension(guidpath, ext);
+                if (File.Exists(candidate))
+                {
+                    assetpath = candidate;
+                    break;
+                }
+            }
 
             // deal with orphan guid files
-            if (!File.Exists(assetpath))
+            if (assetpath == null)
             {
                 File.Delete(guidpath);
                 continue;
