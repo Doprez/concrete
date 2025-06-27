@@ -12,34 +12,43 @@ public class MeshRenderer : Component
     private bool skinned = false;
     private SceneInstance instance;
 
-    [Include]
-    public string modelPath
+    [Show] [Include]
+    public Guid modelGuid
     {
-        get => currentModelPath;
+        get => currentModelGuid;
         set
         {
-            currentModelPath = value;
+            currentModelGuid = value;
 
-            // calc global model path
-            string fullModelPath = Path.Combine(Path.GetDirectoryName(ProjectManager.loadedProjectFilePath), currentModelPath);
+            if (currentModelGuid != Guid.Empty)
+            {
+                // calc model path
+                string relativeModelPath = AssetDatabase.GetPath(currentModelGuid);
+                string fullModelPath = Path.Combine(ProjectManager.projectRoot, relativeModelPath);
 
-            // extract all meshes
-            meshes = ModelReader.GetMeshes(fullModelPath);
+                // extract all meshes
+                meshes = ModelReader.GetMeshes(fullModelPath);
 
-            // create instance for animation
-            instance = SceneTemplate.Create(ModelRoot.Load(fullModelPath).DefaultScene).CreateInstance();
+                // create instance for animation
+                instance = SceneTemplate.Create(ModelRoot.Load(fullModelPath).DefaultScene).CreateInstance();
 
-            // check if mesh is skinned
-            if (instance.GetDrawableInstance(0).Transform is SkinnedTransform) skinned = true;
+                // check if mesh is skinned
+                if (instance.GetDrawableInstance(0).Transform is SkinnedTransform) skinned = true;
 
-            // create shader
-            shader = skinned ? Shader.CreateSkinned() : Shader.CreateDefault();
+                // create shader
+                shader = skinned ? Shader.CreateSkinned() : Shader.CreateDefault();
+            }
         }
     }
-    private string currentModelPath;
+
+    private Guid currentModelGuid;
 
     public override void Render(float deltaTime, Matrix4x4 view, Matrix4x4 proj)
     {
+        // dont render if no model is loaded
+        if (currentModelGuid == Guid.Empty) return;
+
+        // set shader
         shader.Use();
 
         // set camera

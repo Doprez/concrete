@@ -9,6 +9,8 @@ public static class ProjectManager
     public static string loadedProjectFilePath = null;
     public static ProjectData loadedProjectData = null;
 
+    public static string projectRoot => Directory.GetParent(Path.GetFullPath(loadedProjectFilePath)).FullName;
+
     public static void SaveProject(string path)
     {
         ProjectSerializer.SaveProject(path, loadedProjectData);
@@ -22,18 +24,13 @@ public static class ProjectManager
         Engine.window.Title = "Concrete Engine [" + Path.GetFullPath(loadedProjectFilePath) + "]";
 
         // initialize asset database
-        string root = Directory.GetParent(Path.GetFullPath(loadedProjectFilePath)).FullName;
-        AssetDatabase.Initialize(root);
+        AssetDatabase.Initialize(projectRoot);
 
         // try to load startup scene
         if (loadedProjectData.firstScene != "")
         {
             string sceneRelativePath = AssetDatabase.GetPath(Guid.Parse(loadedProjectData.firstScene));
-            string sceneFullPath = Path.Combine(root, sceneRelativePath);
-
-            Console.WriteLine("rel: " + sceneRelativePath);
-            Console.WriteLine("full: " + sceneFullPath);
-
+            string sceneFullPath = Path.Combine(projectRoot, sceneRelativePath);
             SceneManager.LoadScene(sceneFullPath);
         }
         else
