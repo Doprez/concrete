@@ -85,7 +85,7 @@ public static unsafe class FilesWindow
                 if (ImGui.BeginDragDropSource())
                 {
                     byte[] payload = Encoding.UTF8.GetBytes(path);
-                    fixed (byte* ptr = payload) ImGui.SetDragDropPayload("payload1", ptr, (nuint)payload.Length);
+                    fixed (byte* ptr = payload) ImGui.SetDragDropPayload("file_path", ptr, (nuint)payload.Length);
                     ImGui.Text(endname);
                     ImGui.EndDragDropSource();
                 }
@@ -109,14 +109,14 @@ public static unsafe class FilesWindow
                 if (ImGui.BeginDragDropSource())
                 {
                     byte[] payload = Encoding.UTF8.GetBytes(path);
-                    fixed (byte* ptr = payload) ImGui.SetDragDropPayload("payload1", ptr, (nuint)payload.Length);
+                    fixed (byte* ptr = payload) ImGui.SetDragDropPayload("file_path", ptr, (nuint)payload.Length);
                     ImGui.Text(endname);
                     ImGui.EndDragDropSource();
                 }
 
                 if (ImGui.BeginDragDropTarget())
                 {
-                    var payload = ImGui.AcceptDragDropPayload("payload1");
+                    var payload = ImGui.AcceptDragDropPayload("file_path");
                     if (!payload.IsNull)
                     {
                         string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
