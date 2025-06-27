@@ -36,7 +36,7 @@ public unsafe class ImGuiController
     private int width;
     private int height;
 
-    public ImGuiController(GL opengl, IView view, IInputContext input)
+    public ImGuiController(GL opengl, IView view, IInputContext input, string font = null, int fontSize = 14)
     {
         // init window
         this.opengl = opengl;
@@ -56,8 +56,15 @@ public unsafe class ImGuiController
         // set flags
         ImGui.GetIO().BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
         
-        // set stuff
+        // set font
+        if (font != null)
+        {
+            ImGui.GetIO().Fonts.Clear();
+            ImGui.GetIO().Fonts.AddFontFromFileTTF(font, fontSize);
+        }
         CreateDeviceResources();
+
+        // initialize frame data
         SetPerFrameImGuiData(1f / 60f);
 
         // other imgui settings

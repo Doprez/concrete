@@ -32,7 +32,7 @@ public static class Engine
     {
         opengl = GL.GetApi(window);
         input = window.CreateInput();
-        igcontroller = new ImGuiController(opengl, window, input);
+        igcontroller = new ImGuiController(opengl, window, input, "res/fonts/cascadia.ttf", 18);
         ProjectManager.LoadProject("example/project.json");
     }
 

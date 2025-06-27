@@ -177,7 +177,7 @@ public static unsafe class Editor
         }
 
         {
-            var buttonsize = new Vector2(50, 0);
+            var buttonsize = new Vector2(0, 0);
             var padding = ImGui.GetStyle().WindowPadding;
             var moving = guizmoOperation == ImGuizmoOperation.Translate;
             var rotating = guizmoOperation == ImGuizmoOperation.Rotate;
@@ -233,7 +233,7 @@ public static unsafe class Editor
         ImGui.Image((nint)game_fb.colorTexture, game_fb.size, Vector2.UnitY, Vector2.UnitX);
 
         {
-            var buttonsize = new Vector2(64, 0);
+            var buttonsize = new Vector2(0, 0);
             var padding = ImGui.GetStyle().WindowPadding;
             var stopped = SceneManager.playState == PlayState.stopped;
             var playing = SceneManager.playState == PlayState.playing;
@@ -429,9 +429,7 @@ public static unsafe class Editor
             ImGui.Spacing();
 
             // add component button
-            int width = 128;
-            int center = (int)ImGui.GetContentRegionAvail().X / 2;
-            ImGui.SetCursorPosX(center - width / 2);
+            int width = (int)ImGui.GetContentRegionAvail().X;
             if (ImGui.Button("add component", new Vector2(width, 0))) ImGui.OpenPopup("ChooseComponent");
 
             // add component popup
