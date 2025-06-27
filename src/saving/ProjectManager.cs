@@ -21,22 +21,25 @@ public static class ProjectManager
         loadedProjectData = ProjectSerializer.LoadProject(path);
         Engine.window.Title = "Concrete Engine [" + Path.GetFullPath(loadedProjectFilePath) + "]";
 
-        if (loadedProjectData.firstScene != "")
-        {
-            // load default scene
-            string projectRoot = Path.GetDirectoryName(path);
-            string scenePath = projectRoot + "/" + loadedProjectData.firstScene;
-            SceneManager.LoadScene(scenePath);
-        }
-        else
-        {
-            // load empty scene
-            SceneManager.CreateAndLoadNewScene();
-        }
-
         // initialize asset database
         string root = Directory.GetParent(Path.GetFullPath(loadedProjectFilePath)).FullName;
         AssetDatabase.Initialize(root);
+
+        // try to load startup scene
+        if (loadedProjectData.firstScene != "")
+        {
+            string sceneRelativePath = AssetDatabase.GetPath(Guid.Parse(loadedProjectData.firstScene));
+            string sceneFullPath = Path.Combine(root, sceneRelativePath);
+
+            Console.WriteLine("rel: " + sceneRelativePath);
+            Console.WriteLine("full: " + sceneFullPath);
+
+            SceneManager.LoadScene(sceneFullPath);
+        }
+        else
+        {
+            SceneManager.CreateAndLoadNewScene();
+        }
     }
 
     public static void CreateAndLoadNewProject(string path)
