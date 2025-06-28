@@ -24,7 +24,7 @@ public static unsafe class GameWindow
         game_fb.Resize(ImGui.GetContentRegionAvail());
         game_fb.Bind();
         game_fb.Clear(Color.DarkGray);
-        var cam = SceneManager.loadedScene.FindAnyCamera();
+        var cam = Scene.Current.FindAnyCamera();
         SceneManager.RenderSceneObjects(deltaTime, cam.view, cam.proj);
         game_fb.Unbind();
 

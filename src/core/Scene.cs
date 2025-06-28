@@ -6,6 +6,8 @@ public class Scene : IDisposable
 {
     [Include] public List<GameObject> gameObjects = [];
 
+    public static Scene Current => SceneManager.loadedScene;
+
     public Scene()
     {
         // do nothing
@@ -14,25 +16,6 @@ public class Scene : IDisposable
     public void Dispose()
     {
         foreach (var gameObject in gameObjects) gameObject.Dispose();
-    }
-
-    public List<Light> FindActiveLights()
-    {
-        List<Light> lights = [];
-        foreach (var gameObject in gameObjects)
-        {
-            if (gameObject.enabled)
-            {
-                foreach (var component in gameObject.components)
-                {
-                    if (component is Light light)
-                    {
-                        lights.Add(light);
-                    }
-                }
-            }
-        }
-        return lights;
     }
 
     public Camera FindAnyCamera()
@@ -55,6 +38,17 @@ public class Scene : IDisposable
         GameObject result = null;
         foreach (var gameObject in gameObjects) if (gameObject.guid == guid) result = gameObject;
         return result;
+    }
+
+    public GameObject AddGameObject()
+    {
+        var gameObject = new GameObject();
+        gameObject.transform = gameObject.AddComponent<Transform>();
+        gameObject.guid = Guid.NewGuid();
+        gameObject.name = $"GameObject ({gameObjects.Count})";
+        gameObject.enabled = true;
+        gameObjects.Add(gameObject);
+        return gameObject;
     }
 
     public void RemoveGameObject(GameObject gameObject)

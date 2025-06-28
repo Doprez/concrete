@@ -21,18 +21,6 @@ public class GameObject : IDisposable
         foreach (var component in components) component.Dispose();
     }
 
-    public static GameObject Create()
-    {
-        var scene = SceneManager.loadedScene;
-        var gameObject = new GameObject();
-        gameObject.transform = gameObject.AddComponent<Transform>();
-        gameObject.guid = Guid.NewGuid();
-        gameObject.name = $"GameObject ({scene.gameObjects.Count})";
-        gameObject.enabled = true;
-        scene.gameObjects.Add(gameObject);
-        return gameObject;
-    }
-
     public T AddComponent<T>() where T : Component, new()
     {
         T component = new T();

@@ -40,13 +40,14 @@ public static class SceneManager
 
     public static void CreateAndLoadNewScene()
     {
-        LoadScene(new Scene());
+        var scene = new Scene();
+        LoadScene(scene);
 
-        var cameraObject = GameObject.Create();
+        var cameraObject = scene.AddGameObject();
         cameraObject.AddComponent<Camera>();
         cameraObject.name = "Main Camera";
 
-        var lightObject = GameObject.Create();
+        var lightObject = scene.AddGameObject();
         lightObject.AddComponent<DirectionalLight>();
         lightObject.transform.localEulerAngles = new Vector3(20, 135, 0);
         lightObject.name = "Directional Light";

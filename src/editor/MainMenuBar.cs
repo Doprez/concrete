@@ -43,7 +43,7 @@ public static unsafe class MainMenuBar
             if (ImGui.BeginMenu("Scene"))
             {
                 if (ImGui.MenuItem("New")) SceneManager.CreateAndLoadNewScene();
-                ImGui.BeginDisabled(SceneManager.loadedScene == null);
+                ImGui.BeginDisabled(Scene.Current == null);
                 if (ImGui.MenuItem("Save")) saveScene = true;
                 ImGui.EndDisabled();
                 if (ImGui.MenuItem("Open")) openScene = true;
