@@ -183,7 +183,7 @@ public static unsafe class FilesWindow
                 for (int i = 0; i < dirs.Length; i++) RenderDirectoryAndInsides(dirs[i]);
 
                 string[] files = Directory.GetFiles(currentPath);
-                for (int i = 0; i < files.Length; i++) RenderFile(files[i]);
+                for (int i = 0; i < files.Length; i++) if (Path.GetExtension(files[i]) != ".guid") RenderFile(files[i]);
             }
         }
 
