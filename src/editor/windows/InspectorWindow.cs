@@ -8,6 +8,7 @@ using Hexa.NET.ImGui;
 using Hexa.NET.ImGuizmo;
 using Hexa.NET.ImPlot;
 using System.Text;
+using SharpGLTF.Schema2;
 
 namespace Concrete;
 
@@ -146,26 +147,55 @@ public static unsafe class InspectorWindow
         }
         else if (type == typeof(Guid))
         {
-            Guid value = (Guid)curvalue;
+            Guid curguid = (Guid)curvalue;
 
-            string currentAsset = AssetDatabase.GetPath(value);
-            ImGui.InputText(nametoshow, ref currentAsset, 100, ImGuiInputTextFlags.ReadOnly);
+            string display = "...";
 
-            if (ImGui.BeginDragDropTarget())
+            // current guid belongs to asset
+            var asset = AssetDatabase.GetPath(curguid);
+            if (asset != null) display = asset;
+
+            // current guid belongs to gameobject
+            var gobject = Scene.Current.FindGameObject(curguid);
+            if (gobject != null) display = gobject.name;
+
+            ImGui.InputText(nametoshow, ref display, 100, ImGuiInputTextFlags.ReadOnly);
+
+            // asset drag and drop
+            if (asset != null || curguid == Guid.Empty)
             {
-                var payload = ImGui.AcceptDragDropPayload("file_path");
-                if (!payload.IsNull)
+                if (ImGui.BeginDragDropTarget())
                 {
-                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
-                    string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
-                    string extension = Path.GetExtension(relative);
-                    if (extension == ".glb" || extension == ".gltf")
+                    var payload = ImGui.AcceptDragDropPayload("file_path");
+                    if (!payload.IsNull)
                     {
-                        var newguid = AssetDatabase.GetGuid(relative);
-                        SetMemberValue(member, newguid);
+                        string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
+                        string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
+                        string extension = Path.GetExtension(relative);
+                        if (extension == ".glb" || extension == ".gltf")
+                        {
+                            var newguid = AssetDatabase.GetGuid(relative);
+                            SetMemberValue(member, newguid);
+                        }
                     }
+                    ImGui.EndDragDropTarget();
                 }
-                ImGui.EndDragDropTarget();
+            }
+
+            // gameobject drag and drop
+            if (gobject != null || curguid == Guid.Empty)
+            {
+                if (ImGui.BeginDragDropTarget())
+                {
+                    var payload = ImGui.AcceptDragDropPayload("gameobject_guid");
+                    if (!payload.IsNull)
+                    {
+                        var newguid = *(Guid*)payload.Data;
+                        var newgobject = Scene.Current.FindGameObject(newguid);
+                        if (newgobject != null) SetMemberValue(member, newguid);
+                    }
+                    ImGui.EndDragDropTarget();
+                }
             }
         }
 
