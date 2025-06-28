@@ -102,6 +102,18 @@ public static unsafe class FilesWindow
 
             RenderDirectoryInsides(root);
 
+            ImGui.InvisibleButton("", ImGui.GetContentRegionAvail());
+            if (ImGui.BeginDragDropTarget())
+            {
+                var payload = ImGui.AcceptDragDropPayload("file_path");
+                if (!payload.IsNull)
+                {
+                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
+                    movequeue.Add((file, ProjectManager.projectRoot));
+                }
+                ImGui.EndDragDropTarget();
+            }
+
             void RenderFile(string path)
             {
                 var fileflags = ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen;
