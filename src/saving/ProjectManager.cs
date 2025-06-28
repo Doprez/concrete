@@ -24,7 +24,7 @@ public static class ProjectManager
         Engine.window.Title = "Concrete Engine [" + Path.GetFullPath(loadedProjectFilePath) + "]";
 
         // initialize asset database
-        AssetDatabase.Initialize(projectRoot);
+        AssetDatabase.Rebuild();
 
         // try to load startup scene
         if (loadedProjectData.firstScene != "")

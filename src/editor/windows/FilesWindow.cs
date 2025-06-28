@@ -39,6 +39,8 @@ public static unsafe class FilesWindow
                     string guid_path_moved = Path.Combine(dest_path, Path.GetFileName(guid_path));
                     File.Move(item_path, item_path_moved); // move asset file
                     if (File.Exists(guid_path)) File.Move(guid_path, guid_path_moved); // move guid file
+
+                    AssetDatabase.Rebuild();
                 }
 
                 // if file is guid
@@ -49,6 +51,8 @@ public static unsafe class FilesWindow
 
                     File.Move(item_path, item_path_moved); // move guid file
                     if (File.Exists(asset_path)) File.Move(asset_path, asset_path_moved); // move asset file
+
+                    AssetDatabase.Rebuild();
                 }
             }
 
@@ -56,6 +60,8 @@ public static unsafe class FilesWindow
             if (Directory.Exists(item_path))
             {
                 Directory.Move(item_path, item_path_moved);
+
+                AssetDatabase.Rebuild();
             }
         }
         movequeue.Clear();
@@ -84,6 +90,8 @@ public static unsafe class FilesWindow
                 
                 // create the folder
                 Directory.CreateDirectory(newfolderpath);
+                
+                AssetDatabase.Rebuild();
             }
             ImGui.EndDisabled();
 
@@ -95,6 +103,7 @@ public static unsafe class FilesWindow
                 if (Directory.Exists(selectedFileOrDir)) Directory.Delete(selectedFileOrDir, true);
                 else File.Delete(selectedFileOrDir);
                 selectedFileOrDir = null;
+                AssetDatabase.Rebuild();
             }
             ImGui.EndDisabled();
 

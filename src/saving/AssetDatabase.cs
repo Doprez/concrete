@@ -34,8 +34,11 @@ public static class AssetDatabase
     }
 
     // scans for missing guids and rebuilds them
-    public static void Initialize(string root)
+    public static void Rebuild()
     {
+        // set root
+        string root = ProjectManager.projectRoot;
+
         // empty database
         GuidToPathMap.Clear();
         PathToGuidMap.Clear();
