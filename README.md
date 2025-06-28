@@ -10,23 +10,20 @@
 - component based architecture
 - simple imgui based editor
 - simple opengl renderer
-- supports any model file
+- complete gltf support
+- skinned mesh rendering
 - skeletal animation
 
 ## Example
 ```csharp
-var testScene = new Scene();
-SceneManager.LoadScene(testScene);
+var scene = new Scene();
+LoadScene(scene);
 
-var cameraObject = GameObject.Create();
+var cameraObject = scene.AddGameObject();
 cameraObject.AddComponent<Camera>();
-cameraObject.name = "Camera";
+cameraObject.name = "Main Camera";
 
-var modelObject = GameObject.Create();
-modelObject.AddComponent<ModelRenderer>().modelPath = "res/models/cesium.glb";
-modelObject.name = "Cesium Model";
-
-var lightObject = GameObject.Create();
+var lightObject = scene.AddGameObject();
 lightObject.AddComponent<DirectionalLight>();
 lightObject.transform.localEulerAngles = new Vector3(20, 135, 0);
 lightObject.name = "Directional Light";
