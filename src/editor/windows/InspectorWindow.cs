@@ -130,6 +130,11 @@ public static unsafe class InspectorWindow
             string value = (string)curvalue;
             if (ImGui.InputText(nametoshow, ref value, 100)) SetMemberValue(member, value);
         }
+        else if (type == typeof(bool))
+        {
+            bool value = (bool)curvalue;
+            if (ImGui.Checkbox(nametoshow, ref value)) SetMemberValue(member, value);
+        }
         else if (type == typeof(Vector3))
         {
             Vector3 value = (Vector3)curvalue;
@@ -140,10 +145,13 @@ public static unsafe class InspectorWindow
             Vector2 value = (Vector2)curvalue;
             if (ImGui.DragFloat2(nametoshow, ref value, 0.1f)) SetMemberValue(member, value);
         }
-        else if (type == typeof(bool))
+        else if (type == typeof(Color))
         {
-            bool value = (bool)curvalue;
-            if (ImGui.Checkbox(nametoshow, ref value)) SetMemberValue(member, value);
+            var flags = ImGuiColorEditFlags.NoInputs;
+            var ColorToVector = (Color color) => new Vector3(color.R, color.G, color.B) / 255f;
+            var VectorToColor = (Vector3 vector) => Color.FromArgb(255, (int)(vector.X * 255), (int)(vector.Y * 255), (int)(vector.Z * 255));
+            var value = ColorToVector((Color)curvalue);
+            if (ImGui.ColorPicker3(nametoshow, ref value, flags)) SetMemberValue(member, VectorToColor(value));
         }
         else if (type == typeof(Guid))
         {

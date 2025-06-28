@@ -1,11 +1,12 @@
 using System.Numerics;
+using System.Drawing;
 
 namespace Concrete;
 
 public abstract class Light : Component
 {
     [Include] [Show] public float brightness = 1;
-    [Include] [Show] public Vector3 color = Vector3.One;
+    [Include] [Show] public Color color = Color.White;
 
     public Light()
     {

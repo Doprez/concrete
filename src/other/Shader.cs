@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Numerics;
 using Silk.NET.OpenGL;
 
@@ -90,6 +91,8 @@ public class Shader
 
     public void SetLights(List<Light> lights)
     {
+        var ColorToVector = (Color color) => new Vector3(color.R, color.G, color.B) / 255f;
+        
         var directionalLights = new List<DirectionalLight>();
         var pointLights = new List<PointLight>();
         var spotLights = new List<SpotLight>();
@@ -136,7 +139,7 @@ public class Shader
             var light = directionalLights[i];
             SetVector3($"dirLights[{i}].direction", light.gameObject.transform.forward);
             SetFloat($"dirLights[{i}].brightness", light.brightness);
-            SetVector3($"dirLights[{i}].color", light.color);
+            SetVector3($"dirLights[{i}].color", ColorToVector(light.color));
         }
 
         // set point lights
@@ -145,7 +148,7 @@ public class Shader
             var light = pointLights[i];
             SetVector3($"pointLights[{i}].position", light.gameObject.transform.worldPosition);
             SetFloat($"pointLights[{i}].brightness", light.brightness);
-            SetVector3($"pointLights[{i}].color", light.color);
+            SetVector3($"pointLights[{i}].color", ColorToVector(light.color));
             SetFloat($"pointLights[{i}].range", light.range);
         }
 
@@ -156,7 +159,7 @@ public class Shader
             SetVector3($"spotLights[{i}].position", light.gameObject.transform.worldPosition);
             SetVector3($"spotLights[{i}].direction", light.gameObject.transform.forward);
             SetFloat($"spotLights[{i}].brightness", light.brightness);
-            SetVector3($"spotLights[{i}].color", light.color);
+            SetVector3($"spotLights[{i}].color", ColorToVector(light.color));
             SetFloat($"spotLights[{i}].range", light.range);
             SetFloat($"spotLights[{i}].angle", light.angle);
             SetFloat($"spotLights[{i}].softness", light.softness);
