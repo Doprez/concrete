@@ -75,9 +75,9 @@ public static unsafe class InspectorWindow
         void DrawVariables()
         {
             var fields = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
-            foreach (var field in fields) DrawField(field, component);
+            foreach (var field in fields) DrawMember(field, component);
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead && p.CanWrite);
-            foreach (var property in properties) DrawProperty(property, component);
+            foreach (var property in properties) DrawMember(property, component);
         }
 
         bool visible = true;
@@ -92,58 +92,64 @@ public static unsafe class InspectorWindow
         }
     }
 
-    private static void DrawField(FieldInfo field, Component component)
+    private static void DrawMember(MemberInfo member, Component component)
     {
+        bool isfield = member is FieldInfo;
+        var tryfield = member as FieldInfo;
+        var tryproperty = member as PropertyInfo;
+
         bool show = false;
-        string showname = null;
-        foreach (var attribute in field.GetCustomAttributes()) if (attribute is ShowAttribute showAttribute)
+        string showAttributeName = null;
+        var attributes = isfield ? tryfield.GetCustomAttributes() : tryproperty.GetCustomAttributes();
+        foreach (var attribute in attributes) if (attribute is ShowAttribute showAttribute)
         {
             show = true;
-            showname = showAttribute.name;
+            showAttributeName = showAttribute.name;
             break;
         }
         if (!show) return;
 
-        var type = field.FieldType;
-        var name = showname == null ? field.Name : showname;
-        var curvalue = field.GetValue(component);
+        var type = isfield ? tryfield.FieldType : tryproperty.PropertyType;
+        var membername = isfield ? tryfield.Name : tryproperty.Name;
+        var nametoshow = showAttributeName ?? membername;
+        var curvalue = isfield ? tryfield.GetValue(component) : tryproperty.GetValue(component);
 
         if (type == typeof(int))
         {
             int value = (int)curvalue;
-            if (ImGui.DragInt(name, ref value)) field.SetValue(component, value);
+            if (ImGui.DragInt(nametoshow, ref value)) SetMemberValue(member, value);
         }
         else if (type == typeof(float))
         {
             float value = (float)curvalue;
-            if (ImGui.DragFloat(name, ref value, 0.1f)) field.SetValue(component, value);
+            if (ImGui.DragFloat(nametoshow, ref value, 0.1f)) SetMemberValue(member, value);
         }
         else if (type == typeof(string))
         {
             string value = (string)curvalue;
-            if (ImGui.InputText(name, ref value, 100)) field.SetValue(component, value);
+            if (ImGui.InputText(nametoshow, ref value, 100)) SetMemberValue(member, value);
         }
         else if (type == typeof(Vector3))
         {
             Vector3 value = (Vector3)curvalue;
-            if (ImGui.DragFloat3(name, ref value, 0.1f)) field.SetValue(component, value);
+            if (ImGui.DragFloat3(nametoshow, ref value, 0.1f)) SetMemberValue(member, value);
         }
         else if (type == typeof(Vector2))
         {
             Vector2 value = (Vector2)curvalue;
-            if (ImGui.DragFloat2(name, ref value, 0.1f)) field.SetValue(component, value);
+            if (ImGui.DragFloat2(nametoshow, ref value, 0.1f)) SetMemberValue(member, value);
         }
         else if (type == typeof(bool))
         {
             bool value = (bool)curvalue;
-            if (ImGui.Checkbox(name, ref value)) field.SetValue(component, value);
+            if (ImGui.Checkbox(nametoshow, ref value)) SetMemberValue(member, value);
         }
         else if (type == typeof(Guid))
         {
             Guid value = (Guid)curvalue;
 
             string currentAsset = AssetDatabase.GetPath(value);
-            ImGui.InputText(name, ref currentAsset, 100, ImGuiInputTextFlags.ReadOnly);
+            ImGui.InputText(nametoshow, ref currentAsset, 100, ImGuiInputTextFlags.ReadOnly);
 
             if (ImGui.BeginDragDropTarget())
             {
@@ -156,83 +162,17 @@ public static unsafe class InspectorWindow
                     if (extension == ".glb" || extension == ".gltf")
                     {
                         var newguid = AssetDatabase.GetGuid(relative);
-                        field.SetValue(component, newguid);
+                        SetMemberValue(member, newguid);
                     }
                 }
                 ImGui.EndDragDropTarget();
             }
         }
-    }
 
-    private static void DrawProperty(PropertyInfo property, Component component)
-    {
-        bool show = false;
-        string showname = null;
-        foreach (var attribute in property.GetCustomAttributes()) if (attribute is ShowAttribute showAttribute)
+        void SetMemberValue(MemberInfo member, object value)
         {
-            show = true;
-            showname = showAttribute.name;
-            break;
-        }
-        if (!show) return;
-
-        var type = property.PropertyType;
-        var name = showname == null ? property.Name : showname;
-        var curvalue = property.GetValue(component);
-
-        if (type == typeof(int))
-        {
-            int value = (int)curvalue;
-            if (ImGui.DragInt(name, ref value)) property.SetValue(component, value);
-        }
-        else if (type == typeof(float))
-        {
-            float value = (float)curvalue;
-            if (ImGui.DragFloat(name, ref value, 0.1f)) property.SetValue(component, value);
-        }
-        else if (type == typeof(string))
-        {
-            string value = (string)curvalue;
-            if (ImGui.InputText(name, ref value, 100)) property.SetValue(component, value);
-        }
-        else if (type == typeof(Vector3))
-        {
-            Vector3 value = (Vector3)curvalue;
-            if (ImGui.DragFloat3(name, ref value, 0.1f)) property.SetValue(component, value);
-        }
-        else if (type == typeof(Vector2))
-        {
-            Vector2 value = (Vector2)curvalue;
-            if (ImGui.DragFloat2(name, ref value, 0.1f)) property.SetValue(component, value);
-        }
-        else if (type == typeof(bool))
-        {
-            bool value = (bool)curvalue;
-            if (ImGui.Checkbox(name, ref value)) property.SetValue(component, value);
-        }
-        else if (type == typeof(Guid))
-        {
-            Guid value = (Guid)curvalue;
-
-            string currentAsset = AssetDatabase.GetPath(value);
-            ImGui.InputText(name, ref currentAsset, 100, ImGuiInputTextFlags.ReadOnly);
-
-            if (ImGui.BeginDragDropTarget())
-            {
-                var payload = ImGui.AcceptDragDropPayload("file_path");
-                if (!payload.IsNull)
-                {
-                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
-                    string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
-                    string extension = Path.GetExtension(relative);
-                    if (extension == ".glb" || extension == ".gltf")
-                    {
-                        var newguid = AssetDatabase.GetGuid(relative);
-                        property.SetValue(component, newguid);
-                    }
-                }
-                ImGui.EndDragDropTarget();
-            }
+            if (isfield) tryfield.SetValue(component, value);
+            else tryproperty.SetValue(component, value);
         }
     }
 }
