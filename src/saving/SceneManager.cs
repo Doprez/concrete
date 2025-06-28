@@ -5,9 +5,10 @@ namespace Concrete;
 
 public static class SceneManager
 {
-    public static Scene loadedScene = null;
     public static PlayState playState = PlayState.stopped;
-    public static string cachePath = "cache.scene";
+
+    private static Scene loadedScene = null;
+    private static string cachePath = "cache.scene";
 
     public static void StartPlaying()
     {
@@ -36,6 +37,12 @@ public static class SceneManager
         // load cache
         LoadScene(cachePath);
         if (File.Exists(cachePath)) File.Delete(cachePath);
+    }
+
+    public static Scene GetLoadedScene()
+    {
+        var loaded = loadedScene;
+        return loaded;
     }
 
     public static void CreateAndLoadNewScene()

@@ -6,7 +6,7 @@ public class Scene : IDisposable
 {
     [Include] public List<GameObject> gameObjects = [];
 
-    public static Scene Current => SceneManager.loadedScene;
+    public static Scene Current => SceneManager.GetLoadedScene();
 
     public Scene()
     {
