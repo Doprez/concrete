@@ -33,7 +33,7 @@ public class MeshRenderer : Component
                 instance = SceneTemplate.Create(ModelRoot.Load(fullModelPath).DefaultScene).CreateInstance();
 
                 // check if mesh is skinned
-                if (instance.GetDrawableInstance(0).Transform is SkinnedTransform) skinned = true;
+                skinned = instance.GetDrawableInstance(0).Transform is SkinnedTransform;
 
                 // create shader
                 shader = skinned ? Shader.CreateSkinned() : Shader.CreateDefault();

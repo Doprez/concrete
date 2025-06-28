@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using Hexa.NET.ImGui;
 using Hexa.NET.ImGuizmo;
 using Hexa.NET.ImPlot;
+using System.Text;
 
 namespace Concrete;
 
@@ -140,8 +141,26 @@ public static unsafe class InspectorWindow
         else if (type == typeof(Guid))
         {
             Guid value = (Guid)curvalue;
-            string str = value.ToString();
-            ImGui.InputText(name, ref str, 100, ImGuiInputTextFlags.ReadOnly);
+
+            string currentAsset = AssetDatabase.GetPath(value);
+            ImGui.InputText(name, ref currentAsset, 100, ImGuiInputTextFlags.ReadOnly);
+
+            if (ImGui.BeginDragDropTarget())
+            {
+                var payload = ImGui.AcceptDragDropPayload("file_path");
+                if (!payload.IsNull)
+                {
+                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
+                    string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
+                    string extension = Path.GetExtension(relative);
+                    if (extension == ".glb" || extension == ".gltf")
+                    {
+                        var newguid = AssetDatabase.GetGuid(relative);
+                        field.SetValue(component, newguid);
+                    }
+                }
+                ImGui.EndDragDropTarget();
+            }
         }
     }
 
@@ -194,8 +213,26 @@ public static unsafe class InspectorWindow
         else if (type == typeof(Guid))
         {
             Guid value = (Guid)curvalue;
-            string str = value.ToString();
-            ImGui.InputText(name, ref str, 100, ImGuiInputTextFlags.ReadOnly);
+
+            string currentAsset = AssetDatabase.GetPath(value);
+            ImGui.InputText(name, ref currentAsset, 100, ImGuiInputTextFlags.ReadOnly);
+
+            if (ImGui.BeginDragDropTarget())
+            {
+                var payload = ImGui.AcceptDragDropPayload("file_path");
+                if (!payload.IsNull)
+                {
+                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
+                    string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
+                    string extension = Path.GetExtension(relative);
+                    if (extension == ".glb" || extension == ".gltf")
+                    {
+                        var newguid = AssetDatabase.GetGuid(relative);
+                        property.SetValue(component, newguid);
+                    }
+                }
+                ImGui.EndDragDropTarget();
+            }
         }
     }
 }
