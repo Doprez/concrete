@@ -30,4 +30,4 @@ lightObject.name = "Directional Light";
 ```
 
 ## Gallery
-<img src="https://github.com/user-attachments/assets/7364e07b-b64b-4d5b-b70c-ed3c33572acb"/>
+<img src="https://github.com/user-attachments/assets/b215b060-00c7-444b-9a78-d16a20d0f513"/>
