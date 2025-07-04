@@ -194,6 +194,46 @@ public static unsafe class InspectorWindow
                 ImGui.EndDragDropTarget();
             }
         }
+        else if (type == typeof(GameObjectReference))
+        {
+            GameObjectReference cur_gobj_ref = (GameObjectReference)curvalue;
+
+            string display = "...";
+
+            // if has reference
+            if (cur_gobj_ref != null)
+            {
+                // get guid
+                Guid cur_guid = cur_gobj_ref.guid;
+
+                // set name
+                display = Scene.Current.FindGameObject(cur_guid).name;
+            }
+
+            // readonly text box
+            ImGui.InputText(nametoshow, ref display, 100, ImGuiInputTextFlags.ReadOnly);
+
+            // drag and dropping
+            if (ImGui.BeginDragDropTarget())
+            {
+                // if drag and drop is gameobject guid
+                var payload = ImGui.AcceptDragDropPayload("gameobject_guid");
+                if (!payload.IsNull)
+                {
+                    var new_gobj_guid = *(Guid*)payload.Data;
+                    var new_gobj = Scene.Current.FindGameObject(new_gobj_guid);
+
+                    // if gameobject exists
+                    if (new_gobj != null)
+                    {
+                        var new_gobj_ref = new GameObjectReference();
+                        new_gobj_ref.guid = new_gobj_guid;
+                        SetMemberValue(new_gobj_ref);
+                    }
+                }
+                ImGui.EndDragDropTarget();
+            }
+        }
 
         void SetMemberValue(object value)
         {
