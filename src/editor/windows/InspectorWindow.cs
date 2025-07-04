@@ -118,32 +118,32 @@ public static unsafe class InspectorWindow
         if (type == typeof(int))
         {
             int value = (int)curvalue;
-            if (ImGui.DragInt(nametoshow, ref value)) SetMemberValue(member, value);
+            if (ImGui.DragInt(nametoshow, ref value)) SetMemberValue(value);
         }
         else if (type == typeof(float))
         {
             float value = (float)curvalue;
-            if (ImGui.DragFloat(nametoshow, ref value, 0.1f)) SetMemberValue(member, value);
+            if (ImGui.DragFloat(nametoshow, ref value, 0.1f)) SetMemberValue(value);
         }
         else if (type == typeof(string))
         {
             string value = (string)curvalue;
-            if (ImGui.InputText(nametoshow, ref value, 100)) SetMemberValue(member, value);
+            if (ImGui.InputText(nametoshow, ref value, 100)) SetMemberValue(value);
         }
         else if (type == typeof(bool))
         {
             bool value = (bool)curvalue;
-            if (ImGui.Checkbox(nametoshow, ref value)) SetMemberValue(member, value);
+            if (ImGui.Checkbox(nametoshow, ref value)) SetMemberValue(value);
         }
         else if (type == typeof(Vector3))
         {
             Vector3 value = (Vector3)curvalue;
-            if (ImGui.DragFloat3(nametoshow, ref value, 0.1f)) SetMemberValue(member, value);
+            if (ImGui.DragFloat3(nametoshow, ref value, 0.1f)) SetMemberValue(value);
         }
         else if (type == typeof(Vector2))
         {
             Vector2 value = (Vector2)curvalue;
-            if (ImGui.DragFloat2(nametoshow, ref value, 0.1f)) SetMemberValue(member, value);
+            if (ImGui.DragFloat2(nametoshow, ref value, 0.1f)) SetMemberValue(value);
         }
         else if (type == typeof(Color))
         {
@@ -151,63 +151,51 @@ public static unsafe class InspectorWindow
             var ColorToVector = (Color color) => new Vector3(color.R, color.G, color.B) / 255f;
             var VectorToColor = (Vector3 vector) => Color.FromArgb(255, (int)(vector.X * 255), (int)(vector.Y * 255), (int)(vector.Z * 255));
             var value = ColorToVector((Color)curvalue);
-            if (ImGui.ColorPicker3(nametoshow, ref value, flags)) SetMemberValue(member, VectorToColor(value));
+            if (ImGui.ColorPicker3(nametoshow, ref value, flags)) SetMemberValue(VectorToColor(value));
         }
-        else if (type == typeof(Guid))
+        else if (type == typeof(ModelReference))
         {
-            Guid curguid = (Guid)curvalue;
+            ModelReference cur_model_ref = (ModelReference)curvalue;
 
             string display = "...";
 
-            // current guid belongs to asset
-            var asset = AssetDatabase.GetPath(curguid);
-            if (asset != null) display = asset;
-
-            // current guid belongs to gameobject
-            var gobject = Scene.Current.FindGameObject(curguid);
-            if (gobject != null) display = gobject.name;
-
-            ImGui.InputText(nametoshow, ref display, 100, ImGuiInputTextFlags.ReadOnly);
-
-            // asset drag and drop
-            if (asset != null || curguid == Guid.Empty)
+            // if has reference
+            if (cur_model_ref != null)
             {
-                if (ImGui.BeginDragDropTarget())
-                {
-                    var payload = ImGui.AcceptDragDropPayload("file_path");
-                    if (!payload.IsNull)
-                    {
-                        string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
-                        string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
-                        string extension = Path.GetExtension(relative);
-                        if (extension == ".glb" || extension == ".gltf")
-                        {
-                            var newguid = AssetDatabase.GetGuid(relative);
-                            SetMemberValue(member, newguid);
-                        }
-                    }
-                    ImGui.EndDragDropTarget();
-                }
+                // get guid
+                Guid cur_guid = cur_model_ref.guid;
+
+                // set name
+                display = AssetDatabase.GetPath(cur_guid);
             }
 
-            // gameobject drag and drop
-            if (gobject != null || curguid == Guid.Empty)
+            // readonly text box
+            ImGui.InputText(nametoshow, ref display, 100, ImGuiInputTextFlags.ReadOnly);
+
+            // drag and dropping
+            if (ImGui.BeginDragDropTarget())
             {
-                if (ImGui.BeginDragDropTarget())
+                // if drag and drop is asset
+                var payload = ImGui.AcceptDragDropPayload("file_path");
+                if (!payload.IsNull)
                 {
-                    var payload = ImGui.AcceptDragDropPayload("gameobject_guid");
-                    if (!payload.IsNull)
+                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
+                    string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
+                    string extension = Path.GetExtension(relative);
+
+                    // if asset is model
+                    if (extension == ".glb" || extension == ".gltf")
                     {
-                        var newguid = *(Guid*)payload.Data;
-                        var newgobject = Scene.Current.FindGameObject(newguid);
-                        if (newgobject != null) SetMemberValue(member, newguid);
+                        var new_model_ref = new ModelReference();
+                        new_model_ref.guid = AssetDatabase.GetGuid(relative);
+                        SetMemberValue(new_model_ref);
                     }
-                    ImGui.EndDragDropTarget();
                 }
+                ImGui.EndDragDropTarget();
             }
         }
 
-        void SetMemberValue(MemberInfo member, object value)
+        void SetMemberValue(object value)
         {
             if (isfield) tryfield.SetValue(component, value);
             else tryproperty.SetValue(component, value);

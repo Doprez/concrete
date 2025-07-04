@@ -13,17 +13,17 @@ public class MeshRenderer : Component
     private SceneInstance instance;
 
     [Show] [Include]
-    public Guid model
+    public ModelReference model
     {
         get => currentModel;
         set
         {
             currentModel = value;
 
-            if (currentModel != Guid.Empty)
+            if (currentModel != null)
             {
                 // calc model path
-                string relativeModelPath = AssetDatabase.GetPath(currentModel);
+                string relativeModelPath = AssetDatabase.GetPath(currentModel.guid);
                 string fullModelPath = Path.Combine(ProjectManager.projectRoot, relativeModelPath);
 
                 // extract all meshes
@@ -41,12 +41,12 @@ public class MeshRenderer : Component
         }
     }
 
-    private Guid currentModel;
+    private ModelReference currentModel;
 
     public override void Render(float deltaTime, Matrix4x4 view, Matrix4x4 proj)
     {
         // dont render if no model is loaded
-        if (currentModel == Guid.Empty) return;
+        if (currentModel == null) return;
 
         // set shader
         shader.Use();
