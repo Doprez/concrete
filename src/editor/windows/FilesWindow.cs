@@ -13,7 +13,8 @@ namespace Concrete;
 
 public static unsafe class FilesWindow
 {
-    private static string selectedFileOrDir = null;
+    public static string selectedFileOrDir = null;
+    public static string hoveredFileOrDir = null;
 
     static List<(string item, string dest)> movequeue = [];
 
@@ -21,6 +22,8 @@ public static unsafe class FilesWindow
 
     public static void Draw(float deltaTime)
     {
+        hoveredFileOrDir = null;
+
         foreach (var tuple in movequeue)
         {
             string item_path = tuple.item;
@@ -135,6 +138,9 @@ public static unsafe class FilesWindow
                 string endname = Path.GetFileName(path);
                 ImGui.PushID(path);
                 ImGui.TreeNodeEx(endname, fileflags);
+
+                if (ImGui.IsItemHovered()) hoveredFileOrDir = path;
+
                 if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0)) selectedFileOrDir = path;
 
                 if (ImGui.BeginDragDropSource())
@@ -159,6 +165,9 @@ public static unsafe class FilesWindow
                 string endname = Path.GetFileName(path);
 
                 bool open = ImGui.TreeNodeEx(endname, dirflags);
+
+                if (ImGui.IsItemHovered()) hoveredFileOrDir = path;
+
                 if (ImGui.IsItemClicked()) selectedFileOrDir = path;
 
                 if (ImGui.BeginDragDropSource())

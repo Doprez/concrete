@@ -63,11 +63,20 @@ public static class Engine
         if (!FilesWindow.hovered) return;
         foreach (var path in paths)
         {
+            // calculate destination parent
+            var parent = ProjectManager.projectRoot;
+            var hovered = FilesWindow.hoveredFileOrDir;
+            if (hovered != null)
+            {
+                if (Directory.Exists(hovered)) parent = Path.GetFullPath(hovered);
+                if (File.Exists(hovered)) parent = Path.GetDirectoryName(Path.GetFullPath(hovered));
+            }
+
             if (Directory.Exists(path))
             {
                 // move dir to project dir
                 var dirname = Path.GetFileName(path);
-                var destination = Path.Combine(ProjectManager.projectRoot, dirname);
+                var destination = Path.Combine(parent, dirname);
                 Directory.Move(path, destination);
                 
                 // rebuild asset database
@@ -77,7 +86,7 @@ public static class Engine
             {
                 // move file to project dir
                 var filename = Path.GetFileName(path);
-                var destination = Path.Combine(ProjectManager.projectRoot, filename);
+                var destination = Path.Combine(parent, filename);
                 Directory.Move(path, destination);
                 
                 // rebuild asset database
