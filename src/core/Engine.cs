@@ -24,6 +24,7 @@ public static class Engine
         window.Update += UpdateWindow;
         window.Render += RenderWindow;
         window.FramebufferResize += ResizeWindow;
+        window.FileDrop += FileDrop;
         window.Run();
         window.Dispose();
     }
@@ -55,5 +56,33 @@ public static class Engine
     static void ResizeWindow(Vector2D<int> size)
     {
         opengl.Viewport(size);
+    }
+
+    static void FileDrop(string[] paths)
+    {
+        if (!FilesWindow.hovered) return;
+        foreach (var path in paths)
+        {
+            if (Directory.Exists(path))
+            {
+                // move dir to project dir
+                var dirname = Path.GetFileName(path);
+                var destination = Path.Combine(ProjectManager.projectRoot, dirname);
+                Directory.Move(path, destination);
+                
+                // rebuild asset database
+                AssetDatabase.Rebuild();
+            }
+            else if (File.Exists(path))
+            {
+                // move file to project dir
+                var filename = Path.GetFileName(path);
+                var destination = Path.Combine(ProjectManager.projectRoot, filename);
+                Directory.Move(path, destination);
+                
+                // rebuild asset database
+                AssetDatabase.Rebuild();
+            }
+        }
     }
 }

@@ -17,6 +17,8 @@ public static unsafe class FilesWindow
 
     static List<(string item, string dest)> movequeue = [];
 
+    public static bool hovered = false;
+
     public static void Draw(float deltaTime)
     {
         foreach (var tuple in movequeue)
@@ -67,6 +69,8 @@ public static unsafe class FilesWindow
         movequeue.Clear();
 
         ImGui.Begin("Files");
+
+        hovered = ImGui.IsWindowHovered();
 
         if (ProjectManager.loadedProjectFilePath != null)
         {
