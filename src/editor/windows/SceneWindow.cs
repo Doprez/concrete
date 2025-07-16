@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 
 using Hexa.NET.ImGui;
 using Hexa.NET.ImGuizmo;
-using Hexa.NET.ImPlot;
 
 namespace Concrete;
 
@@ -37,7 +36,7 @@ public static unsafe class SceneWindow
         var scenecornerpos = ImGui.GetCursorPos();
 
         // show framebuffer as image
-        ImGui.Image((nint)scene_fb.colorTexture, scene_fb.size, Vector2.UnitY, Vector2.UnitX);
+        ImGui.Image((ImTextureID)scene_fb.colorTexture, scene_fb.size, Vector2.UnitY, Vector2.UnitX);
 
         // imguizmo
         if (HierarchyWindow.selectedGameObject != null)
@@ -86,7 +85,7 @@ public static unsafe class SceneWindow
             if (ImGui.Button("scale", buttonsize)) guizmoOperation = ImGuizmoOperation.Scale;
             ImGui.EndDisabled();
             ImGui.SameLine();
-            ImGui.SeparatorEx(ImGuiSeparatorFlags.Vertical, 1);
+            ImGuiP.SeparatorEx(ImGuiSeparatorFlags.Vertical, 1);
             ImGui.SameLine();
             ImGui.BeginDisabled(local);
             if (ImGui.Button("local", buttonsize)) guizmoMode = ImGuizmoMode.Local;

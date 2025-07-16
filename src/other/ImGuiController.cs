@@ -155,7 +155,7 @@ public unsafe class ImGuiController
         style.Colors[(int)ImGuiCol.TableRowBgAlt] = new Vector4(1.0f, 1.0f, 1.0f, 0.05999999865889549f);
         style.Colors[(int)ImGuiCol.TextSelectedBg] = new Vector4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 0.3499999940395355f);
         style.Colors[(int)ImGuiCol.DragDropTarget] = new Vector4(1.0f, 1.0f, 0.0f, 0.8999999761581421f);
-        style.Colors[(int)ImGuiCol.NavHighlight] = new Vector4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 1.0f);
+        style.Colors[(int)ImGuiCol.NavCursor] = new Vector4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 1.0f);
         style.Colors[(int)ImGuiCol.NavWindowingHighlight] = new Vector4(1.0f, 1.0f, 1.0f, 0.699999988079071f);
         style.Colors[(int)ImGuiCol.NavWindowingDimBg] = new Vector4(0.800000011920929f, 0.800000011920929f, 0.800000011920929f, 0.2000000029802322f);
         style.Colors[(int)ImGuiCol.ModalWindowDimBg] = new Vector4(0.800000011920929f, 0.800000011920929f, 0.800000011920929f, 0.3499999940395355f);
@@ -550,7 +550,7 @@ public unsafe class ImGuiController
         fontTexture.Bind();
         fontTexture.SetMagFilter(TextureMagFilter.Linear);
         fontTexture.SetMinFilter(TextureMinFilter.Linear);
-        io.Fonts.SetTexID((IntPtr) fontTexture.GlTexture);
+        io.Fonts.SetTexID((Hexa.NET.ImGui.ImTextureID)fontTexture.GlTexture);
         opengl.BindTexture(GLEnum.Texture2D, (uint) lastTexture);
     }
 }

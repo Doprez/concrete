@@ -141,7 +141,7 @@ public static unsafe class FilesWindow
 
                 if (ImGui.IsItemHovered()) hoveredFileOrDir = path;
 
-                if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0)) selectedFileOrDir = path;
+                if (ImGui.IsItemHovered() && ImGuiP.IsMouseClicked(0)) selectedFileOrDir = path;
 
                 if (ImGui.BeginDragDropSource())
                 {
@@ -191,7 +191,7 @@ public static unsafe class FilesWindow
 
                 if (open)
                 {
-                    if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0)) selectedFileOrDir = path;
+                    if (ImGui.IsItemHovered() && ImGuiP.IsMouseClicked(0)) selectedFileOrDir = path;
                     RenderDirectoryInsides(path);
                     ImGui.TreePop();
                 }

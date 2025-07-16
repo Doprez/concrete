@@ -29,27 +29,27 @@ public static unsafe class Editor
 
     private static void SetupDockSpace()
     {
-        int dockspace = ImGui.DockSpaceOverViewport((ImGuiDockNodeFlags)ImGuiDockNodeFlagsPrivate.NoWindowMenuButton);
+        uint dockspace = ImGui.DockSpaceOverViewport((ImGuiDockNodeFlags)ImGuiDockNodeFlagsPrivate.NoWindowMenuButton);
         if (!dockbuilderInitialized)
         {
-            int left, mid, right;
-            int topleft, lowleft;
-            int topmid, lowmid;
+            uint left, mid, right;
+            uint topleft, lowleft;
+            uint topmid, lowmid;
 
-            ImGui.DockBuilderSplitNode(dockspace, ImGuiDir.Left, 0.25f, &left, &mid);
-            ImGui.DockBuilderSplitNode(mid, ImGuiDir.Left, 0.66f, &mid, &right);
-            ImGui.DockBuilderSplitNode(left, ImGuiDir.Up, 0.5f, &topleft, &lowleft);
-            ImGui.DockBuilderSplitNode(mid, ImGuiDir.Down, 0.3f, &lowmid, &topmid);
+            ImGuiP.DockBuilderSplitNode(dockspace, ImGuiDir.Left, 0.25f, &left, &mid);
+            ImGuiP.DockBuilderSplitNode(mid, ImGuiDir.Left, 0.66f, &mid, &right);
+            ImGuiP.DockBuilderSplitNode(left, ImGuiDir.Up, 0.5f, &topleft, &lowleft);
+            ImGuiP.DockBuilderSplitNode(mid, ImGuiDir.Down, 0.3f, &lowmid, &topmid);
 
-            ImGui.DockBuilderDockWindow("Scene", topmid);
-            ImGui.DockBuilderDockWindow("Game", topmid);
-            ImGui.DockBuilderDockWindow("Metrics", topmid);
-            ImGui.DockBuilderDockWindow("Hierarchy", topleft);
-            ImGui.DockBuilderDockWindow("Files", lowleft);
-            ImGui.DockBuilderDockWindow("Inspector", right);
-            ImGui.DockBuilderDockWindow("Console", lowmid);
+            ImGuiP.DockBuilderDockWindow("Scene", topmid);
+            ImGuiP.DockBuilderDockWindow("Game", topmid);
+            ImGuiP.DockBuilderDockWindow("Metrics", topmid);
+            ImGuiP.DockBuilderDockWindow("Hierarchy", topleft);
+            ImGuiP.DockBuilderDockWindow("Files", lowleft);
+            ImGuiP.DockBuilderDockWindow("Inspector", right);
+            ImGuiP.DockBuilderDockWindow("Console", lowmid);
 
-            ImGui.DockBuilderFinish(dockspace);
+            ImGuiP.DockBuilderFinish(dockspace);
             dockbuilderInitialized = true;
         }
     }

@@ -5,8 +5,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 using Hexa.NET.ImGui;
-using Hexa.NET.ImGuizmo;
-using Hexa.NET.ImPlot;
 
 namespace Concrete;
 
@@ -32,7 +30,7 @@ public static unsafe class GameWindow
         var gamecornerpos = ImGui.GetCursorPos();
 
         // show framebuffer as image
-        ImGui.Image((nint)game_fb.colorTexture, game_fb.size, Vector2.UnitY, Vector2.UnitX);
+        ImGui.Image((ImTextureID)game_fb.colorTexture, game_fb.size, Vector2.UnitY, Vector2.UnitX);
 
         {
             var buttonsize = new Vector2(0, 0);
@@ -49,7 +47,7 @@ public static unsafe class GameWindow
             if (ImGui.Button("play", buttonsize))
             {
                 SceneManager.StartPlaying();
-                ImGui.FocusWindow(ImGui.FindWindowByName("Game"), ImGuiFocusRequestFlags.None);
+                ImGuiP.FocusWindow(ImGuiP.FindWindowByName("Game"), ImGuiFocusRequestFlags.None);
             }
             ImGui.EndDisabled();
             ImGui.SameLine();
@@ -64,7 +62,6 @@ public static unsafe class GameWindow
             ImGui.BeginDisabled(stopped);
             if (ImGui.Button("stop", buttonsize)) SceneManager.StopPlaying();
             ImGui.EndDisabled();
-            ImGui.End();
             ImGui.PopStyleColor(3);
         }
         
