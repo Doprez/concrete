@@ -70,7 +70,7 @@ public static class FileDialog
             // button to go up a directory
             if (ImGui.Selectable("..", false, ImGuiSelectableFlags.AllowDoubleClick))
             {
-                if (ImGuiP.IsMouseDoubleClicked(0))
+                if (ImGui.IsMouseDoubleClicked(0))
                 {
                     var parent = Directory.GetParent(currentPath);
                     if (parent != null) currentPath = parent.FullName;
@@ -84,7 +84,7 @@ public static class FileDialog
                 if (ImGui.Selectable(folders[i].Name, selected, ImGuiSelectableFlags.AllowDoubleClick))
                 {
                     currentFile = string.Empty;
-                    if (ImGuiP.IsMouseDoubleClicked(0))
+                    if (ImGui.IsMouseDoubleClicked(0))
                     {
                         currentPath = folders[i].FullName;
                         folderSelectIndex = 0;
