@@ -118,7 +118,7 @@ public static unsafe class FilesWindow
 
             RenderDirectoryInsides(root);
 
-            ImGui.InvisibleButton("", ImGui.GetContentRegionAvail());
+            ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
             if (ImGui.BeginDragDropTarget())
             {
                 var payload = ImGui.AcceptDragDropPayload("file_path");

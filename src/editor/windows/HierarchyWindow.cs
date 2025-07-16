@@ -47,7 +47,7 @@ public static unsafe class HierarchyWindow
         ImGui.Separator();
 
         foreach (var gameObject in Scene.Current.gameObjects) if (gameObject.transform.parent == null) DrawHierarchyMember(gameObject);
-        ImGui.InvisibleButton("", ImGui.GetContentRegionAvail());
+        ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
         if (ImGui.BeginDragDropTarget())
         {
             var payload = ImGui.AcceptDragDropPayload("gameobject_guid");
