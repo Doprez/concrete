@@ -1,6 +1,6 @@
-<p align="center"><img width="280" src="https://github.com/user-attachments/assets/8d48776d-a0bb-4034-b0ba-fce5f923044f"></p>
+<p align="center"><img width="60%" src="https://github.com/user-attachments/assets/6fadccdb-3a27-4170-afbc-98725970b0e5"></p>
 
-<h1 align="center">Concrete - C# Game Engine</h1>
+<h1 align="center">C# Game Engine</h1>
 
 <p align="center">Modern C# game engine with a Unity like api and structure.</p>
 
