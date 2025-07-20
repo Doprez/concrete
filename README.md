@@ -1,6 +1,4 @@
-<p align="center"><img width="800" src="https://github.com/user-attachments/assets/6fadccdb-3a27-4170-afbc-98725970b0e5"></p>
-
-<h1 align="center">C# Game Engine</h1>
+<p align="center"><img width="80%" src="https://github.com/user-attachments/assets/6fadccdb-3a27-4170-afbc-98725970b0e5"></p>
 
 <p align="center">Modern C# game engine with a Unity like api and structure.</p>
 
