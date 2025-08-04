@@ -1,0 +1,67 @@
+using System.Numerics;
+
+namespace Concrete;
+
+public class GameObject : IDisposable
+{
+    [Include] public Guid guid;
+    [Include] public string name;
+    [Include] public bool enabled;
+    [Include] public Transform transform;
+    [Include] public List<Component> components = [];
+
+    public GameObject()
+    {
+        // do nothing
+    }
+
+    public void Dispose()
+    {
+        foreach (var component in components) component.Dispose();
+    }
+
+    public T AddComponent<T>() where T : Component, new()
+    {
+        T component = new T();
+        component.gameObject = this;
+        components.Add(component);
+        return component;
+    }
+
+    public void RemoveComponent(Component component)
+    {
+        components.Remove(component);
+        component.Dispose();
+    }
+
+    public Component AddComponentOfType(Type type)
+    {
+        var component = (Component)Activator.CreateInstance(type);
+        component.gameObject = this;
+        components.Add(component);
+        return component;
+    }
+
+    public T GetComponent<T>() where T : Component
+    {
+        return components.OfType<T>().FirstOrDefault();
+    }
+
+    public void Start()
+    {
+        if (!enabled) return;
+        foreach (var component in components) component.Start();
+    }
+
+    public void Update(float deltaTime)
+    {
+        if (!enabled) return;
+        foreach (var component in components) component.Update(deltaTime);
+    }
+
+    public void Render(float deltaTime, Matrix4x4 view, Matrix4x4 proj)
+    {
+        if (!enabled) return;
+        foreach (var component in components) component.Render(deltaTime, view, proj);
+    }
+}
