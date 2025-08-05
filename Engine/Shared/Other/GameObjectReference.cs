@@ -1,6 +1,6 @@
 namespace Concrete;
 
-public class GameObjectReference : Component
+public class GameObjectReference
 {
     [Include] public Guid guid;
 

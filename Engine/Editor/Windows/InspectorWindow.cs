@@ -10,8 +10,18 @@ namespace Concrete;
 public static unsafe class InspectorWindow
 {
     private static List<Component> removeComponentQue = [];
-    private static Type[] allTypes = Assembly.GetExecutingAssembly().GetTypes();
+
+    private static Type[] allTypes = GetAllTypesInAllAssemblies();
     private static Type[] componentTypes = allTypes.Where(type => type.IsClass && !type.IsAbstract && type != typeof(Transform) && type.IsSubclassOf(typeof(Component))).ToArray();
+
+    private static Type[] GetAllTypesInAllAssemblies()
+    {
+        List<Type> types = [];
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        foreach (var assembly in assemblies) types.AddRange(assembly.GetTypes());
+        return types.ToArray();
+    }
+
     
     public static void Draw(float deltaTime)
     {

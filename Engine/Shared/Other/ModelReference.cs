@@ -1,6 +1,6 @@
 namespace Concrete;
 
-public class ModelReference : Component
+public class ModelReference
 {
     [Include] public Guid guid;
 
