@@ -18,8 +18,24 @@ public static class ScriptCompiler
             syntaxTrees.Add(syntaxTree);
         }
 
-        // gets references to all dll's this assembly has access to (aka, the shared dll)
-        var references = AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).Select(a => MetadataReference.CreateFromFile(a.Location));
+        // get reference to the public api assembly
+        string executableDirectory = AppContext.BaseDirectory;
+        string sharedAssemblyPath = Path.Combine(executableDirectory, "Shared.dll");
+        if (!File.Exists(sharedAssemblyPath))
+        {
+            Console.WriteLine($"Error: Shared.dll not found at '{sharedAssemblyPath}'");
+            return null;
+        }
+        var sharedAssemblyReference = MetadataReference.CreateFromFile(sharedAssemblyPath);
+
+        // get references to dotnet runtime
+        string[] trustedPlatformAssembliesPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator);
+        var dotnetRuntimeReferences = trustedPlatformAssembliesPaths.Select(path => MetadataReference.CreateFromFile(path)).ToList();
+        
+        // combine all references
+        List<MetadataReference> references = [];
+        references.Add(sharedAssemblyReference);
+        references.AddRange(dotnetRuntimeReferences);
 
         // compile scripts
         var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
