@@ -1,0 +1,1 @@
+dotnet publish ./Engine/Player/Player.csproj -o ./Build/Windows/Player -r win-x64 -c release
