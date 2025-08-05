@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <OutputType>exe</OutputType>
+    <AssemblyName>Player</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

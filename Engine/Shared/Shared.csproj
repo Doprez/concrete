@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <OutputType>library</OutputType>
+    <AssemblyName>Shared</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
