@@ -1,11 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\Common.props" />
+
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>embedded</DebugType>
-    <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
+    <OutputType>library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
