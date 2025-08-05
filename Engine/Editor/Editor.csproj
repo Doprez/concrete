@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>embedded</DebugType>
+    <SatelliteResourceLanguages>cs</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
