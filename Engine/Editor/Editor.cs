@@ -33,7 +33,7 @@ public static class Editor
         NativeWindow.opengl = GL.GetApi(NativeWindow.window);
         NativeWindow.input = NativeWindow.window.CreateInput();
         igcontroller = new ImGuiController(NativeWindow.opengl, NativeWindow.window, NativeWindow.input, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "cascadia.ttf").ToString(), 18);
-        ProjectManager.LoadProject("C:/Users/sjoer/Documents/GitHub/concrete/Example/project.json");
+        ProjectManager.LoadProject("C:/Users/sjoer/Documents/GitHub/concrete/Game/project.json");
     }
 
     static void UpdateWindow(double deltaTime)
