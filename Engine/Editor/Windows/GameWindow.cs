@@ -7,7 +7,6 @@ namespace Concrete;
 
 public static unsafe class GameWindow
 {
-    public static Framebuffer game_fb = new();
     private static bool gameWindowFocussed = false;
     
     public static void Draw(float deltaTime)
@@ -16,18 +15,18 @@ public static unsafe class GameWindow
         gameWindowFocussed = ImGui.IsWindowFocused();
 
         // render to framebuffer
-        game_fb.Resize(ImGui.GetContentRegionAvail());
-        game_fb.Bind();
-        game_fb.Clear(Color.DarkGray);
+        GameRenderWindow.framebuffer.Resize(ImGui.GetContentRegionAvail());
+        GameRenderWindow.framebuffer.Bind();
+        GameRenderWindow.framebuffer.Clear(Color.DarkGray);
         var cam = Scene.Current.FindAnyCamera();
         SceneManager.RenderSceneObjects(deltaTime, cam.view, cam.proj);
-        game_fb.Unbind();
+        GameRenderWindow.framebuffer.Unbind();
 
         // record corner position
         var gamecornerpos = ImGui.GetCursorPos();
 
         // show framebuffer as image
-        ImGui.Image((ImTextureID)game_fb.colorTexture, game_fb.size, Vector2.UnitY, Vector2.UnitX);
+        ImGui.Image((ImTextureID)GameRenderWindow.framebuffer.colorTexture, GameRenderWindow.framebuffer.size, Vector2.UnitY, Vector2.UnitX);
 
         {
             var buttonsize = new Vector2(0, 0);

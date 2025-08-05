@@ -9,7 +9,6 @@ namespace Concrete;
 public static unsafe class SceneWindow
 {
     public static SceneCamera sceneCamera = new();
-    public static Framebuffer scene_fb = new();
     private static bool sceneWindowFocussed = false;
     private static ImGuizmoOperation guizmoOperation = ImGuizmoOperation.Translate;
     private static ImGuizmoMode guizmoMode = ImGuizmoMode.Local;
@@ -23,17 +22,17 @@ public static unsafe class SceneWindow
         if (sceneWindowFocussed) sceneCamera.ApplyMovement(deltaTime);
         
         // render scene to framebuffer
-        scene_fb.Resize(ImGui.GetContentRegionAvail());
-        scene_fb.Bind();
-        scene_fb.Clear(Color.DarkGray);
+        SceneRenderWindow.framebuffer.Resize(ImGui.GetContentRegionAvail());
+        SceneRenderWindow.framebuffer.Bind();
+        SceneRenderWindow.framebuffer.Clear(Color.DarkGray);
         SceneManager.RenderSceneObjects(deltaTime, sceneCamera.view, sceneCamera.proj);
-        scene_fb.Unbind();
+        SceneRenderWindow.framebuffer.Unbind();
 
         // record corner position
         var scenecornerpos = ImGui.GetCursorPos();
 
         // show framebuffer as image
-        ImGui.Image((ImTextureID)scene_fb.colorTexture, scene_fb.size, Vector2.UnitY, Vector2.UnitX);
+        ImGui.Image((ImTextureID)SceneRenderWindow.framebuffer.colorTexture, SceneRenderWindow.framebuffer.size, Vector2.UnitY, Vector2.UnitX);
 
         // imguizmo
         if (HierarchyWindow.selectedGameObject != null)

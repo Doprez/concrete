@@ -6,8 +6,7 @@ namespace Concrete;
 public class SceneCamera
 {
     public Matrix4x4 view => Matrix4x4.CreateLookAt(position, position + forward, up);
-    public Matrix4x4 proj => Matrix4x4.CreatePerspectiveFieldOfView(MathF.PI * fov / 180f, 1280f / 720f, 0.1f, 1000f);
-    // public Matrix4x4 proj => Matrix4x4.CreatePerspectiveFieldOfView(MathF.PI * fov / 180f, (float)SceneWindow.scene_fb.size.X / (float)SceneWindow.scene_fb.size.Y, 0.1f, 1000f);
+    public Matrix4x4 proj => Matrix4x4.CreatePerspectiveFieldOfView(MathF.PI * fov / 180f, (float)SceneRenderWindow.framebuffer.size.X / (float)SceneRenderWindow.framebuffer.size.Y, 0.1f, 1000f);
 
     public float fov = 90;
 
