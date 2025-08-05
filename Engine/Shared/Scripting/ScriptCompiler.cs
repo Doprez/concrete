@@ -8,6 +8,12 @@ public static class ScriptCompiler
 {
     public static Assembly CompileScripts(List<string> paths)
     {
+        var diagnostics = new List<Diagnostic>();
+        return CompileScripts(paths, ref diagnostics);
+    }
+
+    public static Assembly CompileScripts(List<string> paths, ref List<Diagnostic> errors)
+    {
         // parse scripts into syntax trees
         List<SyntaxTree> syntaxTrees = [];
         for (int i = 0; i < paths.Count; i++)
@@ -46,10 +52,10 @@ public static class ScriptCompiler
         var result = compilation.Emit(memoryStream);
 
         // check for compilation errors
+        errors = null;
         if (!result.Success)
         {
-            var errors = result.Diagnostics.Where(diagnosis => diagnosis.Severity == DiagnosticSeverity.Error);
-            foreach (var error in errors) Console.WriteLine(error.ToString());
+            errors = result.Diagnostics.Where(diagnosis => diagnosis.Severity == DiagnosticSeverity.Error).ToList();
             return null;
         }
 

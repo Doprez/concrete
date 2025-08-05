@@ -22,6 +22,11 @@ public static unsafe class InspectorWindow
         return types.ToArray();
     }
 
+    public static void RefreshComponentTypes()
+    {
+        allTypes = GetAllTypesInAllAssemblies();
+        componentTypes = allTypes.Where(type => type.IsClass && !type.IsAbstract && type != typeof(Transform) && type.IsSubclassOf(typeof(Component))).ToArray();
+    }
     
     public static void Draw(float deltaTime)
     {
@@ -53,6 +58,7 @@ public static unsafe class InspectorWindow
             int selectedIndex = -1;
             if (ImGui.BeginPopup("ChooseComponent"))
             {
+                RefreshComponentTypes();
                 for (int i = 0; i < componentTypes.Length; i++)
                 {
                     var type = componentTypes[i];

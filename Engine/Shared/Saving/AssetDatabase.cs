@@ -5,7 +5,7 @@ public static class AssetDatabase
     private static Dictionary<Guid, string> GuidToPathMap = [];
     private static Dictionary<string, Guid> PathToGuidMap = [];
 
-    private static string[] includes = [".scene", ".glb"];
+    private static string[] includes = [".scene", ".glb", ".cs"];
 
     public static string GuidPathFromAssetPath(string asset_path)
     {

@@ -22,6 +22,9 @@ public static class ProjectManager
         // initialize asset database
         AssetDatabase.Rebuild();
 
+        // recompile script assembly
+        ScriptManager.RecompileScripts();
+
         // try to load startup scene
         if (loadedProjectData.firstScene != "")
         {
