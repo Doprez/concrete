@@ -6,14 +6,15 @@ namespace Concrete;
 
 public static class ScriptCompiler
 {
-    public static Assembly CompileScripts(List<string> paths)
-    {
-        var diagnostics = new List<Diagnostic>();
-        return CompileScripts(paths, ref diagnostics);
-    }
+    public static Assembly CompileScripts(List<string> paths) => CompileScripts(paths, out _, out _);
 
-    public static Assembly CompileScripts(List<string> paths, ref List<Diagnostic> errors)
+    public static Assembly CompileScripts(List<string> paths, out List<Diagnostic> errors) => CompileScripts(paths, out errors, out _);
+
+    public static Assembly CompileScripts(List<string> paths, out List<Diagnostic> errors, out byte[] dllbytes)
     {
+        dllbytes = null;
+        errors = null;
+        
         // parse scripts into syntax trees
         List<SyntaxTree> syntaxTrees = [];
         for (int i = 0; i < paths.Count; i++)
@@ -52,12 +53,14 @@ public static class ScriptCompiler
         var result = compilation.Emit(memoryStream);
 
         // check for compilation errors
-        errors = null;
         if (!result.Success)
         {
             errors = result.Diagnostics.Where(diagnosis => diagnosis.Severity == DiagnosticSeverity.Error).ToList();
             return null;
         }
+
+        // return dll bytes
+        dllbytes = memoryStream.ToArray();
 
         // load assembly from il in memory
         var assembly = Assembly.Load(memoryStream.ToArray());

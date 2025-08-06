@@ -26,7 +26,7 @@ public static class Player
     {
         NativeWindow.opengl = GL.GetApi(NativeWindow.window);
         NativeWindow.input = NativeWindow.window.CreateInput();
-        ProjectManager.LoadProject("C:/Users/sjoer/Documents/GitHub/concrete/Game/project.json");
+        ProjectManager.LoadProject("./Data/project.json", Path.GetFullPath("Scripts.dll"));
         SceneManager.StartPlaying();
     }
 
