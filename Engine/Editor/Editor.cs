@@ -109,6 +109,7 @@ public static class Editor
         ConsoleWindow.Draw(deltaTime);
         InspectorWindow.Draw(deltaTime);
         MetricsWindow.Draw(deltaTime);
+        BuildWindow.Draw(deltaTime);
     }
 
     unsafe private static void SetupDockSpace()
@@ -127,6 +128,7 @@ public static class Editor
 
             ImGuiP.DockBuilderDockWindow("Scene", topmid);
             ImGuiP.DockBuilderDockWindow("Game", topmid);
+            ImGuiP.DockBuilderDockWindow("Build", topmid);
             ImGuiP.DockBuilderDockWindow("Metrics", topmid);
             ImGuiP.DockBuilderDockWindow("Hierarchy", topleft);
             ImGuiP.DockBuilderDockWindow("Files", lowleft);

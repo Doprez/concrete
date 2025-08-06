@@ -10,7 +10,6 @@ public static unsafe class MainMenuBar
     private static bool openScene = false;
     private static bool saveScene = false;
     private static bool openProject = false;
-    private static bool buildProject = false;
     private static bool saveProject = false;
     private static bool newProject = false;
     private static string fileDialogPath = "";
@@ -21,7 +20,6 @@ public static unsafe class MainMenuBar
         if (openScene) FileDialog.Show(ref openScene, ref fileDialogPath, true, () => SceneManager.LoadScene(fileDialogPath));
         if (saveScene) FileDialog.Show(ref saveScene, ref fileDialogPath, true, () => SceneManager.SaveScene(fileDialogPath));
         if (openProject) FileDialog.Show(ref openProject, ref fileDialogPath, true, () => ProjectManager.LoadProject(fileDialogPath));
-        if (buildProject) FileDialog.Show(ref buildProject, ref fileDialogPath, false, () => ProjectBuilder.StartBuilding(fileDialogPath));
         if (saveProject) FileDialog.Show(ref saveProject, ref fileDialogPath, true, () => ProjectManager.SaveProject(fileDialogPath));
         if (newProject) FileDialog.Show(ref newProject, ref fileDialogPath, true, () => ProjectManager.CreateAndLoadNewProject(fileDialogPath));
 
@@ -30,15 +28,10 @@ public static unsafe class MainMenuBar
             if (ImGui.BeginMenu("Project"))
             {
                 if (ImGui.MenuItem("New")) newProject = true;
-
                 ImGui.BeginDisabled(ProjectManager.loadedProjectData == null);
                 if (ImGui.MenuItem("Save")) saveProject = true;
                 ImGui.EndDisabled();
-
                 if (ImGui.MenuItem("Open")) openProject = true;
-
-                if (ImGui.MenuItem("Build")) buildProject = true;
-
                 ImGui.EndMenu();
             }
 
