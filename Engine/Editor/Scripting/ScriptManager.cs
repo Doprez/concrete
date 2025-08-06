@@ -11,12 +11,10 @@ public static class ScriptManager
 {
     private static Assembly cachedAssembly;
 
-    public static byte[] RecompileScripts()
+    public static byte[] RecompileScripts(string directoryToScan)
     {
-        string root = ProjectManager.projectRoot;
-
         // scan entire project root recursively for all script files
-        var scriptPaths = Directory.GetFiles(root, "*.cs", SearchOption.AllDirectories).ToList();
+        var scriptPaths = Directory.GetFiles(directoryToScan, "*.cs", SearchOption.AllDirectories).ToList();
 
         if (scriptPaths.Count == 0)
         {
@@ -42,12 +40,5 @@ public static class ScriptManager
         Console.WriteLine("Scripts compiled and loaded successfully.");
 
         return dllbytes;
-    }
-
-    public static void LoadCompilesScriptsFromDisk(string dllpath)
-    {
-        Console.WriteLine("Loading script assembly from disk");
-        Assembly.LoadFile(dllpath);
-        Console.WriteLine("Finished loading script assembly from disk");
     }
 }

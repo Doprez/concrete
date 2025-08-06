@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Reflection;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -26,7 +27,9 @@ public static class Player
     {
         NativeWindow.opengl = GL.GetApi(NativeWindow.window);
         NativeWindow.input = NativeWindow.window.CreateInput();
-        ProjectManager.LoadProject("./Data/project.json", Path.GetFullPath("Scripts.dll"));
+        
+        Assembly.LoadFile(Path.GetFullPath("Scripts.dll"));
+        ProjectManager.LoadProject("./Data/project.json");
         SceneManager.StartPlaying();
     }
 

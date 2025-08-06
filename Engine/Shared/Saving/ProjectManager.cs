@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Concrete;
 
 public static class ProjectManager
@@ -12,7 +14,7 @@ public static class ProjectManager
         ProjectSerializer.SaveProject(path, loadedProjectData);
     }
 
-    public static void LoadProject(string path, string preCompiledScriptAssembly = null)
+    public static void LoadProject(string path)
     {
         // load project
         loadedProjectFilePath = path;
@@ -21,18 +23,6 @@ public static class ProjectManager
 
         // initialize asset database
         AssetDatabase.Rebuild();
-
-        if (preCompiledScriptAssembly == null)
-        {
-            // recompile script assembly
-            ScriptManager.RecompileScripts();
-        }
-        else
-        {
-            // load script assembly dll from disk
-            ScriptManager.LoadCompilesScriptsFromDisk(preCompiledScriptAssembly);
-        }
-        
 
         // try to load startup scene
         if (loadedProjectData.firstScene != "")

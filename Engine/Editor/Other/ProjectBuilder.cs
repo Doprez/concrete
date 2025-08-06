@@ -16,7 +16,7 @@ public static class ProjectBuilder
         for (int i = 0; i < dirs.Length; i++) Directory.Delete(dirs[i], true);
 
         // move script assembly dll to build dir
-        var dllbytes = ScriptManager.RecompileScripts();
+        var dllbytes = ScriptManager.RecompileScripts(ProjectManager.projectRoot);
         File.WriteAllBytes(Path.Combine(build_directory, "Scripts.dll"), dllbytes);
 
         // move game assets to build directory

@@ -33,6 +33,8 @@ public static class Editor
         NativeWindow.opengl = GL.GetApi(NativeWindow.window);
         NativeWindow.input = NativeWindow.window.CreateInput();
         igcontroller = new ImGuiController(NativeWindow.opengl, NativeWindow.window, NativeWindow.input, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "cascadia.ttf").ToString(), 18);
+        
+        ScriptManager.RecompileScripts("C:/Users/sjoer/Documents/GitHub/concrete/Game/");
         ProjectManager.LoadProject("C:/Users/sjoer/Documents/GitHub/concrete/Game/project.json");
     }
 
