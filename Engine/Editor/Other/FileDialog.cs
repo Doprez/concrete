@@ -6,12 +6,11 @@ namespace Concrete;
 
 public static class FileDialog
 {
-    static bool initialPathSet = false;
-
     static int fileSelectIndex = 0;
     static int folderSelectIndex = 0;
 
-    static string currentPath = Directory.GetCurrentDirectory();
+    static string currentPath = ProjectManager.projectRoot;
+    
     static string currentFile = string.Empty;
     static string currentFolder = string.Empty;
 
@@ -32,15 +31,6 @@ public static class FileDialog
     {
         // return if it shouldnt be open
         if (!open) return;
-
-        // try to set initial path
-        if (!initialPathSet && !string.IsNullOrEmpty(resultPath))
-        {
-            if (Directory.Exists(resultPath)) currentPath = resultPath;
-            else if (File.Exists(resultPath)) currentPath = Path.GetDirectoryName(resultPath);
-            else currentPath = Directory.GetCurrentDirectory();
-            initialPathSet = true;
-        }
 
         // setup the imgui window
         string title = singleFile ? "Select a file" : "Select a folder";
@@ -347,7 +337,6 @@ public static class FileDialog
         fileDialogError = string.Empty;
         newFolderError = string.Empty;
         newFileError = string.Empty;
-        initialPathSet = false;
     }
 
     static void ToggleSort(ref SortOrder target, ref SortOrder a, ref SortOrder b, ref SortOrder c)
