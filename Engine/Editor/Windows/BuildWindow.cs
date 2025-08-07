@@ -11,7 +11,7 @@ public static class BuildWindow
     public static string buildDirectory = "";
     private static bool building = false;
     private static bool choosingDirectory = false;
-    private static string status = "Status: Choose settings for the build.";
+    private static string status = "idle";
 
     private static int platform = 0;
     private static string[] availablePlatforms = ["Windows x64", "Linux x64"];
@@ -21,26 +21,35 @@ public static class BuildWindow
     {
         ImGui.Begin("Build", ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoScrollbar);
 
+        ImGui.Text("> Status:");
+
+        ImGui.SameLine();
+
         ImGui.Text(status);
 
         ImGui.Separator();
 
         ImGui.BeginDisabled(building);
 
-        ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
-        ImGui.InputText("##directory", ref buildDirectory, 800);
-
-        if (ImGui.Button("Choose Directory")) choosingDirectory = true;
+        ImGui.Text("Directory:");
 
         ImGui.SameLine();
 
-        ImGui.BeginDisabled(!Directory.Exists(buildDirectory));
-        if (ImGui.Button("Start Building")) StartBuildingAsync();
-        ImGui.EndDisabled();
+        ImGui.SetNextItemWidth(500);
 
-        ImGui.Text("Choose Platform:");
+        ImGui.InputText("##inputdir", ref buildDirectory, 800);
 
-        if (ImGui.BeginCombo("##platform", availablePlatforms[platform]))
+        ImGui.SameLine();
+
+        if (ImGui.Button("Choose")) choosingDirectory = true;
+
+        ImGui.Text("Platform:");
+
+        ImGui.SameLine();
+
+        ImGui.SetNextItemWidth(200);
+
+        if (ImGui.BeginCombo("##platformcombo", availablePlatforms[platform]))
         {
             for (int i = 0; i < availablePlatforms.Length; i++)
             {
@@ -49,6 +58,12 @@ public static class BuildWindow
             }
             ImGui.EndCombo();
         }
+
+        ImGui.BeginDisabled(!Directory.Exists(buildDirectory));
+        if (ImGui.Button("Start Building")) StartBuildingAsync();
+        ImGui.EndDisabled();
+
+        
 
         ImGui.EndDisabled();
 
@@ -63,7 +78,7 @@ public static class BuildWindow
     {
         // initialize
         building = true;
-        status = "Status: Game is being build (initializing...)";
+        status = "Initializing...";
 
         // delete existing directory children
         var files = Directory.GetFiles(buildDirectory);
@@ -72,20 +87,22 @@ public static class BuildWindow
         for (int i = 0; i < dirs.Length; i++) Directory.Delete(dirs[i], true);
 
         // move script assembly dll to build dir
-        status = "Status: Game is being build (compiling scripts...)";
+        status = "Compiling scripts...";
         var dllbytes = ScriptManager.RecompileScripts(ProjectManager.projectRoot);
         File.WriteAllBytes(Path.Combine(buildDirectory, "Scripts.dll"), dllbytes);
 
         // move game assets to build directory
+        status = "Copying game data...";
         CopyDirectory(ProjectManager.projectRoot, Path.Combine(buildDirectory, "Data"));
 
         // copy player pre build files
+        status = "Building player...";
         if (platform == 0) BuildPlayer();
         if (platform == 1) BuildPlayer();
 
         // finalize
         building = false;
-        status = "Status: Game done building.";
+        status = "Finished building.";
         OpenDirectoryInFileExplorer(buildDirectory);
     }
 
