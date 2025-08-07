@@ -29,7 +29,7 @@ public static class Player
         NativeWindow.input = NativeWindow.window.CreateInput();
         
         Assembly.LoadFile(Path.GetFullPath("Scripts.dll"));
-        ProjectManager.LoadProject("./Data/project.json");
+        ProjectManager.LoadProject("./Resources/GameData/project.json");
         SceneManager.StartPlaying();
     }
 

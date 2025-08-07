@@ -93,7 +93,7 @@ public static class BuildWindow
 
         // move game assets to build directory
         status = "Copying game data...";
-        CopyDirectory(ProjectManager.projectRoot, Path.Combine(buildDirectory, "Data"));
+        CopyDirectory(ProjectManager.projectRoot, Path.Combine(buildDirectory, "Resources/GameData"));
 
         // copy player pre build files
         status = "Building player...";
