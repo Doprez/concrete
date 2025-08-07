@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\Common.props" />
+  <Import Project="../Common.props" />
 
   <PropertyGroup>
     <OutputType>exe</OutputType>
@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\shared\shared.csproj" />
+    <ProjectReference Include="../Shared/Shared.csproj" />
   </ItemGroup>
 
 </Project>

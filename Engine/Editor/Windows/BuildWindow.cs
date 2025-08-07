@@ -91,7 +91,7 @@ public static class BuildWindow
 
     public static void BuildPlayer()
     {
-        string csproj = "C:/Users/sjoer/Documents/GitHub/concrete/Engine/Player/Player.csproj";
+        string csproj = Path.GetFullPath("Resources/SourceForGameBuilding/Player/Player.csproj");
 
         string rid = "";
         if (platform == 0) rid = "win-x64";
