@@ -23,17 +23,19 @@
     </Content>
   </ItemGroup>
 
-  <Target Name="ShipSourceForGameBuilding" AfterTargets="Build;Publish">
-
-    <ItemGroup>
-      <SharedSources Include="../Shared/**/*" Exclude="../Shared/bin/**;../Shared/obj/**" />
-      <PlayerSources Include="../Player/**/*" Exclude="../Player/bin/**;../Player/obj/**" />
-    </ItemGroup>
-
-    <Copy SourceFiles="@(SharedSources)" DestinationFolder="$(OutputPath)Resources/SourceForGameBuilding/Shared/%(RecursiveDir)" />
-    <Copy SourceFiles="@(PlayerSources)" DestinationFolder="$(OutputPath)Resources/SourceForGameBuilding/Player/%(RecursiveDir)" />
-    <Copy SourceFiles="../Common.props" DestinationFiles="$(OutputPath)Resources/SourceForGameBuilding/Common.props" />
-
-  </Target>
+  <ItemGroup>
+    <Content Include="../Shared/**/*" Exclude="../Shared/bin/**;../Shared/obj/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Resources/SourceForGameBuilding/Shared/%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="../Player/**/*" Exclude="../Player/bin/**;../Player/obj/**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Resources/SourceForGameBuilding/Player/%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Content>
+    <Content Include="../Common.props">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>Resources/SourceForGameBuilding/Common.props</Link>
+    </Content>
+  </ItemGroup>
 
 </Project>
