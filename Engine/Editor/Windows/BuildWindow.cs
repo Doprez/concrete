@@ -11,7 +11,11 @@ public static class BuildWindow
     public static string buildDirectory = "";
     private static bool building = false;
     private static bool choosingDirectory = false;
-    private static string status = "Status: Choose a directory for the build.";
+    private static string status = "Status: Choose settings for the build.";
+
+    private static int platform = 0;
+    private static string[] availablePlatforms = ["Windows x64", "Linux x64"];
+
 
     public static void Draw(float deltaTime)
     {
@@ -33,6 +37,18 @@ public static class BuildWindow
         ImGui.BeginDisabled(!Directory.Exists(buildDirectory));
         if (ImGui.Button("Start Building")) StartBuildingAsync();
         ImGui.EndDisabled();
+
+        ImGui.Text("Choose Platform:");
+
+        if (ImGui.BeginCombo("##platform", availablePlatforms[platform]))
+        {
+            for (int i = 0; i < availablePlatforms.Length; i++)
+            {
+                if (ImGui.Selectable(availablePlatforms[i], platform == i)) platform = i;
+                if (platform == i) ImGui.SetItemDefaultFocus();
+            }
+            ImGui.EndCombo();
+        }
 
         ImGui.EndDisabled();
 
@@ -63,8 +79,9 @@ public static class BuildWindow
         // move game assets to build directory
         CopyDirectory(ProjectManager.projectRoot, Path.Combine(buildDirectory, "Data"));
 
-        // build player with dotnet cli shell process
-        BuildPlayer(buildDirectory);
+        // copy player pre build files
+        if (platform == 0) BuildPlayer();
+        if (platform == 1) BuildPlayer();
 
         // finalize
         building = false;
@@ -72,14 +89,20 @@ public static class BuildWindow
         OpenDirectoryInFileExplorer(buildDirectory);
     }
 
-    public static void BuildPlayer(string build_directory)
+    public static void BuildPlayer()
     {
+        string csproj = "C:/Users/sjoer/Documents/GitHub/concrete/Engine/Player/Player.csproj";
+
+        string rid = "";
+        if (platform == 0) rid = "win-x64";
+        if (platform == 1) rid = "linux-x64";
+
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"publish C:/Users/sjoer/Documents/GitHub/concrete/Engine/Player/Player.csproj -o {build_directory} -r win-x64 -c release",
+                Arguments = $"publish {csproj} -o {buildDirectory} -r {rid} -c release",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
