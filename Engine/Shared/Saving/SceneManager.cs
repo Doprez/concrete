@@ -7,13 +7,13 @@ public static class SceneManager
     public static PlayState playState = PlayState.stopped;
 
     private static Scene loadedScene = null;
-    private static string cachePath = "cache.scene";
+    private static string snapshotPath = Path.Combine(Path.GetTempPath(), "snapshot.scene");
 
     public static void StartPlaying()
     {
-        // store cache
-        if (File.Exists(cachePath)) File.Delete(cachePath);
-        SaveScene(cachePath);
+        // store scene snapshot
+        if (File.Exists(snapshotPath)) File.Delete(snapshotPath);
+        SaveScene(snapshotPath);
 
         StartSceneObjects();
         playState = PlayState.playing;
@@ -33,9 +33,9 @@ public static class SceneManager
     {
         playState = PlayState.stopped;
         
-        // load cache
-        LoadScene(cachePath);
-        if (File.Exists(cachePath)) File.Delete(cachePath);
+        // load snapshot
+        LoadScene(snapshotPath);
+        if (File.Exists(snapshotPath)) File.Delete(snapshotPath);
     }
 
     public static Scene GetLoadedScene()
