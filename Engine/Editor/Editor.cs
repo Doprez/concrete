@@ -46,6 +46,8 @@ public static class Editor
     static void RenderWindow(double deltaTime)
     {
         NativeWindow.opengl.Enable(EnableCap.DepthTest);
+        NativeWindow.opengl.Enable(EnableCap.Blend);
+        NativeWindow.opengl.BlendFunc(GLEnum.SrcAlpha, GLEnum.OneMinusSrcAlpha);
         NativeWindow.opengl.ClearColor(Color.Black);
         NativeWindow.opengl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         Render((float)deltaTime);

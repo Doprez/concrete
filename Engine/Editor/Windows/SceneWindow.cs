@@ -25,7 +25,13 @@ public static unsafe class SceneWindow
         SceneRenderWindow.framebuffer.Resize(ImGui.GetContentRegionAvail());
         SceneRenderWindow.framebuffer.Bind();
         SceneRenderWindow.framebuffer.Clear(Color.DarkGray);
+
+        // render mesh objects in the scene
         SceneManager.RenderSceneObjects(deltaTime, sceneCamera.view, sceneCamera.proj);
+
+        // draw the grid
+        GridRenderer.Render(deltaTime, sceneCamera.view, sceneCamera.proj);
+
         SceneRenderWindow.framebuffer.Unbind();
 
         // record corner position

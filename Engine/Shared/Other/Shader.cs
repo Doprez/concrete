@@ -15,6 +15,7 @@ public class Shader
 
     public static Shader CreateDefault() => new Shader(GetFullShaderPath("default.vert"), GetFullShaderPath("default.frag"));
     public static Shader CreateSkinned() => new Shader(GetFullShaderPath("skinned.vert"), GetFullShaderPath("default.frag"));
+    public static Shader CreateGrid() => new Shader(GetFullShaderPath("grid.vert"), GetFullShaderPath("grid.frag"));
 
     public Shader(string vertPath, string fragPath)
     {

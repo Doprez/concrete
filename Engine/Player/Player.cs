@@ -42,6 +42,8 @@ public static class Player
     static void RenderWindow(double deltaTime)
     {
         NativeWindow.opengl.Enable(EnableCap.DepthTest);
+        NativeWindow.opengl.Enable(EnableCap.Blend);
+        NativeWindow.opengl.BlendFunc(GLEnum.SrcAlpha, GLEnum.OneMinusSrcAlpha);
         NativeWindow.opengl.ClearColor(Color.DarkGray);
         NativeWindow.opengl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
         SceneManager.RenderSceneObjects((float)deltaTime, Scene.Current.FindAnyCamera().view, Scene.Current.FindAnyCamera().proj);
