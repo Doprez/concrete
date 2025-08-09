@@ -6,14 +6,14 @@ out vec4 color;
 
 uniform vec3 cameraPosition;
 
-const vec3 gridColor = vec3(1);
+const vec3 gridColor = vec3(0.5);
 const vec3 axisXColor = vec3(1.0, 0.0, 0.0);
 const vec3 axisZColor = vec3(0.0, 0.0, 1.0);
 
 const float gridSpacing = 1.0;
 const float lineThickness = 1;
 
-const float fadeDistance = 10.0;
+const float fadeDistance = 4.0;
 const float fadeRange = 20.0;
 
 void main()
@@ -29,14 +29,14 @@ void main()
     float scaledLineThicknessZ = uvDeriv.y * lineThickness;
 
     // distance to nearest grid line
-    float distX = abs(fract(uv.x));
-    float distZ = abs(fract(uv.y));
+    float distX = abs(fract(uv.x + scaledLineThicknessX / 2));
+    float distZ = abs(fract(uv.y + scaledLineThicknessZ / 2));
 
     // check which line the pixel is on
     bool onXLine = distX < scaledLineThicknessX;
     bool onZLine = distZ < scaledLineThicknessZ;
-    bool onAxisX = abs(worldPosition.z) < scaledLineThicknessZ;
-    bool onAxisZ = abs(worldPosition.x) < scaledLineThicknessX;
+    bool onAxisX = abs(worldPosition.z) < scaledLineThicknessZ / 2;
+    bool onAxisZ = abs(worldPosition.x) < scaledLineThicknessX / 2;
 
     // calculate fading alpha
     float alpha = 1.0 - smoothstep(fadeDistance, fadeDistance + fadeRange, distFromCamera);

@@ -24,7 +24,7 @@ public static unsafe class SceneWindow
         // render scene to framebuffer
         SceneRenderWindow.framebuffer.Resize(ImGui.GetContentRegionAvail());
         SceneRenderWindow.framebuffer.Bind();
-        SceneRenderWindow.framebuffer.Clear(Color.DarkGray);
+        SceneRenderWindow.framebuffer.Clear(Color.Transparent);
 
         // render mesh objects in the scene
         SceneManager.RenderSceneObjects(deltaTime, sceneCamera.view, sceneCamera.proj);
