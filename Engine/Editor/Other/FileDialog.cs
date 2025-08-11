@@ -310,15 +310,27 @@ public static class FileDialog
 
             ImGui.SameLine();
 
-            bool disableChoose = false;
-            if (singleFile && currentFile == "") disableChoose = true;
-            if (!singleFile && currentFolder == "") disableChoose = true;
+            bool enableChoose = false;
+            if (singleFile && currentFile != "") enableChoose = true;
+            if (!singleFile)
+            {
+                if (currentFolder != "") enableChoose = true;
+                else if (Directory.Exists(currentPath)) enableChoose = true;
+            }
 
             // choose selected file or folder button
-            ImGui.BeginDisabled(disableChoose);
+            ImGui.BeginDisabled(!enableChoose);
             if (ImGui.Button("Choose", new Vector2(100, 0)))
             {
                 resultPath = Path.Combine(currentPath, !string.IsNullOrEmpty(currentFolder) ? currentFolder : currentFile);
+
+                if (singleFile && currentFile != "") resultPath = Path.Combine(currentPath, currentFile);
+                if (!singleFile)
+                {
+                    if (currentFolder != "") resultPath = Path.Combine(currentPath, currentFolder);
+                    else if (Directory.Exists(currentPath)) resultPath = currentPath;
+                }
+
                 DeSelectAll();
                 OnChoose?.Invoke();
                 open = false;
