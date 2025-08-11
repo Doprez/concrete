@@ -6,7 +6,7 @@ namespace Concrete;
 
 public static class FileDialog
 {
-    static string currentPath = ProjectManager.projectRoot;
+    static string currentPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
     
     static string currentFile = "";
     static string currentFolder = "";
