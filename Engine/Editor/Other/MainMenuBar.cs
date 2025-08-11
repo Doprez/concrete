@@ -7,41 +7,61 @@ namespace Concrete;
 
 public static unsafe class MainMenuBar
 {
-    private static bool openScene = false;
-    private static bool saveScene = false;
-    private static bool openProject = false;
-    private static bool saveProject = false;
-    private static bool newProject = false;
+    private static bool openSceneDialog = false;
+    private static bool saveSceneDialog = false;
+
+    private static bool openProjectFileDialog = false;
+    private static bool saveProjectFileDialog = false;
+
+    private static bool openProjectDirDialog = false;
+    private static bool saveProjectDirDialog = false;
+    
+    private static bool newProjectDirDialog = false;
+
     private static string fileDialogPath = "";
     
     public static void Draw(float deltaTime)
     {
-        // file dialog
-        if (openScene) FileDialog.Show(ref openScene, ref fileDialogPath, true, () => SceneManager.LoadScene(fileDialogPath));
-        if (saveScene) FileDialog.Show(ref saveScene, ref fileDialogPath, true, () => SceneManager.SaveScene(fileDialogPath));
-        if (openProject) FileDialog.Show(ref openProject, ref fileDialogPath, true, () => ProjectManager.LoadProject(fileDialogPath));
-        if (saveProject) FileDialog.Show(ref saveProject, ref fileDialogPath, true, () => ProjectManager.SaveProject(fileDialogPath));
-        if (newProject) FileDialog.Show(ref newProject, ref fileDialogPath, true, () => ProjectManager.CreateAndLoadNewProject(fileDialogPath));
+        if (saveProjectDirDialog) FileDialog.Show(ref saveProjectDirDialog, ref fileDialogPath, false, () => ProjectManager.SaveProjectDir(fileDialogPath));
+        if (saveProjectFileDialog) FileDialog.Show(ref saveProjectFileDialog, ref fileDialogPath, true, () => ProjectManager.SaveProjectFile(fileDialogPath));
+        if (openProjectDirDialog) FileDialog.Show(ref openProjectDirDialog, ref fileDialogPath, false, () => ProjectManager.LoadProjectDir(fileDialogPath));
+        if (openProjectFileDialog) FileDialog.Show(ref openProjectFileDialog, ref fileDialogPath, true, () => ProjectManager.LoadProjectFile(fileDialogPath));
+
+        if (saveSceneDialog) FileDialog.Show(ref saveSceneDialog, ref fileDialogPath, true, () => SceneManager.SaveScene(fileDialogPath));
+        if (openSceneDialog) FileDialog.Show(ref openSceneDialog, ref fileDialogPath, true, () => SceneManager.LoadScene(fileDialogPath));
 
         if (ImGui.BeginMainMenuBar())
         {
-            if (ImGui.BeginMenu("Project"))
+            if (ImGui.BeginMenu("File"))
             {
-                if (ImGui.MenuItem("New")) newProject = true;
-                ImGui.BeginDisabled(ProjectManager.loadedProjectData == null);
-                if (ImGui.MenuItem("Save")) saveProject = true;
-                ImGui.EndDisabled();
-                if (ImGui.MenuItem("Open")) openProject = true;
-                ImGui.EndMenu();
-            }
+                ImGui.Spacing();
 
-            if (ImGui.BeginMenu("Scene"))
-            {
-                if (ImGui.MenuItem("New")) SceneManager.CreateAndLoadNewScene();
-                ImGui.BeginDisabled(Scene.Current == null);
-                if (ImGui.MenuItem("Save")) saveScene = true;
+                if (ImGui.MenuItem("New Project")) ProjectManager.CreateAndLoadTempProject();
+
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+
+                ImGui.BeginDisabled(ProjectManager.loadedProjectData == null);
+                if (ImGui.MenuItem("Save Project")) saveProjectDirDialog = true;
                 ImGui.EndDisabled();
-                if (ImGui.MenuItem("Open")) openScene = true;
+                ImGui.BeginDisabled(ProjectManager.loadedProjectData == null);
+                if (ImGui.MenuItem("Save Project File")) saveProjectFileDialog = true;
+                ImGui.EndDisabled();
+                if (ImGui.MenuItem("Open Project")) openProjectDirDialog = true;
+                if (ImGui.MenuItem("Open Project File")) openProjectFileDialog = true;
+
+                ImGui.Spacing();
+                ImGui.Separator();
+                ImGui.Spacing();
+
+                if (ImGui.MenuItem("New Scene")) SceneManager.CreateAndLoadNewScene();
+                ImGui.BeginDisabled(Scene.Current == null);
+                if (ImGui.MenuItem("Save Scene")) saveSceneDialog = true;
+                ImGui.EndDisabled();
+                if (ImGui.MenuItem("Open Scene")) openSceneDialog = true;
+
+                ImGui.Spacing();
                 ImGui.EndMenu();
             }
 

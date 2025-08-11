@@ -11,14 +11,14 @@ public static class ProjectSerializer
         IndentSize = 4,
     };
 
-    public static void SaveProject(string path, ProjectData project)
+    public static void SaveProjectFile(string path, ProjectData project)
     {
         if (File.Exists(path)) File.Delete(path);
         string json = JsonSerializer.Serialize(project, config);
         File.WriteAllText(path, json);
     }
 
-    public static ProjectData LoadProject(string path)
+    public static ProjectData LoadProjectFile(string path)
     {
         string json = File.ReadAllText(path);
         return JsonSerializer.Deserialize<ProjectData>(json, config);

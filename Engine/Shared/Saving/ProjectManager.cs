@@ -12,11 +12,6 @@ public static class ProjectManager
     public static string memoryFilePath = Path.Combine(Path.GetTempPath(), "memory.txt");
     public static string tempProjectPath = Path.Combine(Path.GetTempPath(), "TempConcreteProject");
 
-    public static void SaveProject(string path)
-    {
-        ProjectSerializer.SaveProject(path, loadedProjectData);
-    }
-
     public static void TryLoadLastProjectOrCreateTempProject()
     {
         if (File.Exists(memoryFilePath))
@@ -28,7 +23,7 @@ public static class ProjectManager
             if (File.Exists(memoryProjectPath))
             {
                 Console.WriteLine("Memory file contained a valid project.");
-                LoadProject(memoryProjectPath);
+                LoadProjectFile(memoryProjectPath);
             }
             else
             {
@@ -52,14 +47,25 @@ public static class ProjectManager
         Directory.CreateDirectory(tempProjectPath);
 
         // create and load and remember temp project
-        CreateAndLoadNewProject(Path.Combine(tempProjectPath, "project.json"));
+        string projectfilepath = Path.Combine(tempProjectPath, "project.json");
+        ProjectSerializer.NewProjectFile(projectfilepath);
+        LoadProjectFile(projectfilepath, true);
+        Directory.CreateDirectory("Scenes");
+        Directory.CreateDirectory("Scripts");
     }
 
-    public static void LoadProject(string path, bool isTemp = false)
+    // ----
+
+    public static void SaveProjectFile(string path)
+    {
+        ProjectSerializer.SaveProjectFile(path, loadedProjectData);
+    }
+
+    public static void LoadProjectFile(string path, bool isTemp = false)
     {
         // load project
         loadedProjectFilePath = path;
-        loadedProjectData = ProjectSerializer.LoadProject(path);
+        loadedProjectData = ProjectSerializer.LoadProjectFile(path);
         NativeWindow.window.Title = "Concrete Engine [" + Path.GetFullPath(loadedProjectFilePath) + "]";
 
         // initialize asset database
@@ -86,11 +92,77 @@ public static class ProjectManager
         }
     }
 
-    public static void CreateAndLoadNewProject(string path)
+    // ----
+
+    public static void NewProjectDir(string dir)
     {
-        ProjectSerializer.NewProjectFile(path);
-        LoadProject(path, true);
+        var filepath = Path.Combine(dir, "project.json");
+        ProjectSerializer.NewProjectFile(filepath);
+        LoadProjectFile(filepath);
         Directory.CreateDirectory("Scenes");
         Directory.CreateDirectory("Scripts");
+    }
+
+    public static void SaveProjectDir(string dir)
+    {
+        CopyDirectory(projectRoot, dir);
+        LoadProjectDir(dir);
+    }
+
+    public static void LoadProjectDir(string dir, bool isTemp = false)
+    {
+        var filepath = Path.Combine(dir, "project.json");
+        if (!File.Exists(filepath)) File.Create(filepath);
+
+        // load project
+        loadedProjectFilePath = filepath;
+        loadedProjectData = ProjectSerializer.LoadProjectFile(filepath);
+        NativeWindow.window.Title = "Concrete Engine [" + Path.GetFullPath(loadedProjectFilePath) + "]";
+
+        // initialize asset database
+        AssetDatabase.Rebuild();
+
+        // try to load startup scene
+        if (loadedProjectData.firstScene != "")
+        {
+            string sceneRelativePath = AssetDatabase.GetPath(Guid.Parse(loadedProjectData.firstScene));
+            string sceneFullPath = Path.Combine(projectRoot, sceneRelativePath);
+            SceneManager.LoadScene(sceneFullPath);
+        }
+        else
+        {
+            SceneManager.CreateAndLoadNewScene();
+        }
+        
+        if (!isTemp)
+        {
+            // remember project
+            if (File.Exists(memoryFilePath)) File.Delete(memoryFilePath);
+            File.WriteAllText(memoryFilePath, filepath);
+            Console.WriteLine("Remembered the newly loaded project.");
+        }
+    }
+
+    private static void CopyDirectory(string source, string dest)
+    {
+        // ensure existence
+        if (!Directory.Exists(source)) throw new DirectoryNotFoundException($"directory not found: {source}");
+
+        // create destination
+        Directory.CreateDirectory(dest);
+
+        // copy files
+        foreach (string file in Directory.GetFiles(source))
+        {
+            string destFile = Path.Combine(dest, Path.GetFileName(file));
+            File.Copy(file, destFile);
+        }
+
+        // copy dirs
+        foreach (string subdir in Directory.GetDirectories(source))
+        {
+            string dubdirdest = Path.Combine(dest, Path.GetFileName(subdir));
+            CopyDirectory(subdir, dubdirdest);
+        }
     }
 }
