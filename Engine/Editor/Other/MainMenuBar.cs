@@ -15,8 +15,6 @@ public static unsafe class MainMenuBar
 
     private static bool openProjectDirDialog = false;
     private static bool saveProjectDirDialog = false;
-    
-    private static bool newProjectDirDialog = false;
 
     private static string fileDialogPath = "";
     

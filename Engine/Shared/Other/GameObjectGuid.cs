@@ -1,10 +1,10 @@
 namespace Concrete;
 
-public class GameObjectReference
+public class GameObjectGuid
 {
     [Include] public Guid guid;
 
-    public GameObjectReference()
+    public GameObjectGuid()
     {
         // do nothing
     }

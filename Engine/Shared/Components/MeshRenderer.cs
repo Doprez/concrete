@@ -13,7 +13,7 @@ public class MeshRenderer : Component
     private SceneInstance instance;
 
     [Show] [Include]
-    public ModelReference model
+    public ModelGuid model
     {
         get => currentModel;
         set
@@ -41,7 +41,7 @@ public class MeshRenderer : Component
         }
     }
 
-    private ModelReference currentModel;
+    private ModelGuid currentModel;
 
     public override void Render(float deltaTime, Matrix4x4 view, Matrix4x4 proj)
     {

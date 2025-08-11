@@ -1,10 +1,10 @@
 namespace Concrete;
 
-public class ModelReference
+public class ModelGuid
 {
     [Include] public Guid guid;
 
-    public ModelReference()
+    public ModelGuid()
     {
         // do nothing
     }

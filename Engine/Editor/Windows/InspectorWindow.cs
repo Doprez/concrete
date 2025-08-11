@@ -164,20 +164,20 @@ public static unsafe class InspectorWindow
             var value = ColorToVector((Color)curvalue);
             if (ImGui.ColorPicker3(nametoshow, ref value, flags)) SetMemberValue(VectorToColor(value));
         }
-        else if (type == typeof(ModelReference))
+        else if (type == typeof(ModelGuid))
         {
-            ModelReference cur_model_ref = (ModelReference)curvalue;
+            ModelGuid model_guid = (ModelGuid)curvalue;
 
             string display = "...";
 
-            // if has reference
-            if (cur_model_ref != null)
+            // it has guid
+            if (model_guid != null)
             {
                 // get guid
-                Guid cur_guid = cur_model_ref.guid;
+                Guid asset_guid = model_guid.guid;
 
                 // set name
-                display = AssetDatabase.GetPath(cur_guid);
+                display = AssetDatabase.GetPath(asset_guid);
             }
 
             // readonly text box
@@ -197,7 +197,7 @@ public static unsafe class InspectorWindow
                     // if asset is model
                     if (extension == ".glb" || extension == ".gltf")
                     {
-                        var new_model_ref = new ModelReference();
+                        var new_model_ref = new ModelGuid();
                         new_model_ref.guid = AssetDatabase.GetGuid(relative);
                         SetMemberValue(new_model_ref);
                     }
@@ -205,20 +205,20 @@ public static unsafe class InspectorWindow
                 ImGui.EndDragDropTarget();
             }
         }
-        else if (type == typeof(GameObjectReference))
+        else if (type == typeof(GameObjectGuid))
         {
-            GameObjectReference cur_gobj_ref = (GameObjectReference)curvalue;
+            GameObjectGuid gameobject_guid = (GameObjectGuid)curvalue;
 
             string display = "...";
 
-            // if has reference
-            if (cur_gobj_ref != null)
+            // if has guid
+            if (gameobject_guid != null)
             {
                 // get guid
-                Guid cur_guid = cur_gobj_ref.guid;
+                Guid asset_guid = gameobject_guid.guid;
 
                 // set name
-                display = Scene.Current.FindGameObject(cur_guid).name;
+                display = Scene.Current.FindGameObject(asset_guid).name;
             }
 
             // readonly text box
@@ -237,7 +237,7 @@ public static unsafe class InspectorWindow
                     // if gameobject exists
                     if (new_gobj != null)
                     {
-                        var new_gobj_ref = new GameObjectReference();
+                        var new_gobj_ref = new GameObjectGuid();
                         new_gobj_ref.guid = new_gobj_guid;
                         SetMemberValue(new_gobj_ref);
                     }
