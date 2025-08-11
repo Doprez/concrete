@@ -105,8 +105,15 @@ public static class ProjectManager
 
     public static void SaveProjectDir(string dir)
     {
-        CopyDirectory(projectRoot, dir);
-        LoadProjectDir(dir);
+        if (dir != projectRoot)
+        {
+            CopyDirectory(projectRoot, dir);
+            LoadProjectDir(dir);
+        }
+        else
+        {
+            Console.WriteLine("Project is already up to date.");
+        }
     }
 
     public static void LoadProjectDir(string dir, bool isTemp = false)
@@ -155,7 +162,7 @@ public static class ProjectManager
         foreach (string file in Directory.GetFiles(source))
         {
             string destFile = Path.Combine(dest, Path.GetFileName(file));
-            File.Copy(file, destFile);
+            File.Copy(file, destFile, true);
         }
 
         // copy dirs
