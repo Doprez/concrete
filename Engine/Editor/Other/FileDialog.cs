@@ -6,26 +6,39 @@ namespace Concrete;
 
 public static class FileDialog
 {
-    static int fileSelectIndex = 0;
-    static int folderSelectIndex = 0;
-
     static string currentPath = ProjectManager.projectRoot;
     
-    static string currentFile = string.Empty;
-    static string currentFolder = string.Empty;
+    static string currentFile = "";
+    static string currentFolder = "";
 
-    static string fileDialogError = string.Empty;
+    static int currentFileIndex = -1;
+    static int currentFolderIndex = -1;
+
+    static string newFolderName = "";
+    static string newFileName = "";
 
     static SortOrder fileNameSortOrder = SortOrder.None;
     static SortOrder sizeSortOrder = SortOrder.None;
     static SortOrder dateSortOrder = SortOrder.None;
     static SortOrder typeSortOrder = SortOrder.None;
 
-    static string newFolderName = string.Empty;
-    static string newFolderError = string.Empty;
+    static void DeSelectFile()
+    {
+        currentFile = "";
+        currentFileIndex = -1;
+    }
 
-    static string newFileName = string.Empty;
-    static string newFileError = string.Empty;
+    static void DeSelectFolder()
+    {
+        currentFolder = "";
+        currentFolderIndex = -1;
+    }
+
+    static void DeSelectAll()
+    {
+        DeSelectFile();
+        DeSelectFolder();
+    }
 
     public static void Show(ref bool open, ref string resultPath, bool singleFile, Action OnChoose = null)
     {
@@ -35,7 +48,7 @@ public static class FileDialog
         // setup the imgui window
         string title = singleFile ? "Select a file" : "Select a folder";
         ImGui.SetNextWindowSize(new Vector2(860, 500), ImGuiCond.FirstUseEver);
-        if (ImGui.Begin(title, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse))
+        if (ImGui.Begin(title, ImGuiWindowFlags.NoCollapse))
         {
             // read the directory
             var directory = new DirectoryInfo(currentPath);
@@ -52,7 +65,7 @@ public static class FileDialog
             float panelHeight = available.Y - offsetHeight;
 
             // folder panel
-            ImGui.BeginChild("Folders", new Vector2(folderPanelWidth, panelHeight), ImGuiWindowFlags.HorizontalScrollbar);
+            ImGui.BeginChild("Folders", new Vector2(folderPanelWidth, panelHeight), ImGuiWindowFlags.NoScrollbar);
 
             // button to go up a directory
             if (ImGui.Selectable("..", false, ImGuiSelectableFlags.AllowDoubleClick))
@@ -60,27 +73,30 @@ public static class FileDialog
                 if (ImGui.IsMouseDoubleClicked(0))
                 {
                     var parent = Directory.GetParent(currentPath);
-                    if (parent != null) currentPath = parent.FullName;
+                    if (parent != null)
+                    {
+                        DeSelectAll();
+                        currentPath = parent.FullName;
+                    }
                 }
             }
 
             // list folders as selectable buttons
             for (int i = 0; i < folders.Count; i++)
             {
-                bool selected = i == folderSelectIndex;
+                bool selected = i == currentFolderIndex;
                 if (ImGui.Selectable(folders[i].Name, selected, ImGuiSelectableFlags.AllowDoubleClick))
                 {
-                    currentFile = string.Empty;
+                    currentFile = "";
                     if (ImGui.IsMouseDoubleClicked(0))
                     {
+                        DeSelectAll();
                         currentPath = folders[i].FullName;
-                        folderSelectIndex = 0;
-                        fileSelectIndex = 0;
-                        currentFolder = string.Empty;
                     }
                     else
                     {
-                        folderSelectIndex = i;
+                        DeSelectFile();
+                        currentFolderIndex = i;
                         currentFolder = folders[i].Name;
                     }
                 }
@@ -110,12 +126,12 @@ public static class FileDialog
             for (int i = 0; i < files.Count; i++)
             {
                 var file = files[i];
-                bool selected = i == fileSelectIndex;
+                bool selected = i == currentFileIndex;
                 if (ImGui.Selectable(file.Name, selected, ImGuiSelectableFlags.AllowDoubleClick))
                 {
-                    fileSelectIndex = i;
+                    DeSelectFolder();
+                    currentFileIndex = i;
                     currentFile = file.Name;
-                    currentFolder = string.Empty;
                 }
 
                 ImGui.NextColumn();
@@ -141,7 +157,7 @@ public static class FileDialog
             ImGui.EndChild();
 
             // display selected path
-            string selectedPath = Path.Combine(currentPath, !string.IsNullOrEmpty(currentFolder) ? currentFolder : currentFile);
+            string selectedPath = Path.Combine(currentPath, currentFolder != "" ? currentFolder : currentFile);
             ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X);
             ImGui.InputText("##selected", ref selectedPath, 512, ImGuiInputTextFlags.ReadOnly);
             ImGui.PopItemWidth();
@@ -167,7 +183,7 @@ public static class FileDialog
             ImGui.SameLine();
 
             // delete file button
-            bool canDeleteFile = !string.IsNullOrEmpty(currentFile);
+            bool canDeleteFile = currentFile != "";
             if (!canDeleteFile) ImGui.BeginDisabled();
             if (ImGui.Button("Delete file")) ImGui.OpenPopup("Delete File");
             if (!canDeleteFile) ImGui.EndDisabled();
@@ -180,31 +196,25 @@ public static class FileDialog
                 ImGui.InputText("##foldername", ref newFolderName, 100);
 
                 // create button
+                bool emptyName = string.IsNullOrWhiteSpace(newFolderName);
+                ImGui.BeginDisabled(emptyName);
                 if (ImGui.Button("Create"))
                 {
-                    if (string.IsNullOrWhiteSpace(newFolderName)) newFolderError = "Name cannot be empty";
-                    else
-                    {
-                        var path = Path.Combine(currentPath, newFolderName);
-                        Directory.CreateDirectory(path);
-                        newFolderName = string.Empty;
-                        newFolderError = string.Empty;
-                        ImGui.CloseCurrentPopup();
-                    }
+                    var path = Path.Combine(currentPath, newFolderName);
+                    Directory.CreateDirectory(path);
+                    newFolderName = "";
+                    ImGui.CloseCurrentPopup();
                 }
+                ImGui.EndDisabled();
 
                 ImGui.SameLine();
 
                 // cancel button
                 if (ImGui.Button("Cancel"))
                 {
-                    newFolderName = string.Empty;
-                    newFolderError = string.Empty;
+                    newFolderName = "";
                     ImGui.CloseCurrentPopup();
                 }
-
-                // deal with folder errors
-                if (!string.IsNullOrEmpty(newFolderError)) ImGui.TextColored(new Vector4(1, 0, 0, 1), newFolderError);
 
                 ImGui.EndPopup();
             }
@@ -217,31 +227,25 @@ public static class FileDialog
                 ImGui.InputText("##filename", ref newFileName, 100);
 
                 // create button
+                bool emptyName = string.IsNullOrWhiteSpace(newFileName);
+                ImGui.BeginDisabled(emptyName);
                 if (ImGui.Button("Create"))
                 {
-                    if (string.IsNullOrWhiteSpace(newFileName)) newFileError = "Name cannot be empty";
-                    else
-                    {
-                        var path = Path.Combine(currentPath, newFileName);
-                        File.Create(path);
-                        newFileName = string.Empty;
-                        newFileError = string.Empty;
-                        ImGui.CloseCurrentPopup();
-                    }
+                    var path = Path.Combine(currentPath, newFileName);
+                    File.Create(path);
+                    newFileName = "";
+                    ImGui.CloseCurrentPopup();
                 }
+                ImGui.EndDisabled();
 
                 ImGui.SameLine();
 
                 // cancel button
                 if (ImGui.Button("Cancel"))
                 {
-                    newFileName = string.Empty;
-                    newFileError = string.Empty;
+                    newFileName = "";
                     ImGui.CloseCurrentPopup();
                 }
-
-                // deal with file errors
-                if (!string.IsNullOrEmpty(newFileError)) ImGui.TextColored(new Vector4(1, 0, 0, 1), newFileError);
 
                 ImGui.EndPopup();
             }
@@ -256,7 +260,7 @@ public static class FileDialog
                 if (ImGui.Button("Yes", new(width, 0)))
                 {
                     Directory.Delete(Path.Combine(currentPath, currentFolder), true);
-                    currentFolder = string.Empty;
+                    DeSelectFolder();
                     ImGui.CloseCurrentPopup();
                 }
 
@@ -280,7 +284,7 @@ public static class FileDialog
                 if (ImGui.Button("Yes", new(width, 0)))
                 {
                     File.Delete(Path.Combine(currentPath, currentFile));
-                    currentFile = string.Empty;
+                    DeSelectFile();
                     ImGui.CloseCurrentPopup();
                 }
 
@@ -300,43 +304,29 @@ public static class FileDialog
             ImGui.SetCursorPosX(available.X - 200);
             if (ImGui.Button("Cancel", new Vector2(100, 0)))
             {
-                Reset();
+                DeSelectAll();
                 open = false;
             }
 
             ImGui.SameLine();
 
+            bool disableChoose = false;
+            if (singleFile && currentFile == "") disableChoose = true;
+            if (!singleFile && currentFolder == "") disableChoose = true;
+
             // choose selected file or folder button
+            ImGui.BeginDisabled(disableChoose);
             if (ImGui.Button("Choose", new Vector2(100, 0)))
             {
-                if (!singleFile && string.IsNullOrEmpty(currentFolder)) fileDialogError = "You must select a folder!";
-                else if (singleFile && string.IsNullOrEmpty(currentFile)) fileDialogError = "You must select a file!";
-                else
-                {
-                    resultPath = Path.Combine(currentPath, !string.IsNullOrEmpty(currentFolder) ? currentFolder : currentFile);
-                    fileDialogError = string.Empty;
-                    Reset();
-                    if (OnChoose != null) OnChoose.Invoke();
-                    open = false;
-                }
+                resultPath = Path.Combine(currentPath, !string.IsNullOrEmpty(currentFolder) ? currentFolder : currentFile);
+                DeSelectAll();
+                OnChoose?.Invoke();
+                open = false;
             }
-
-            // show file dialog error
-            if (!string.IsNullOrEmpty(fileDialogError)) ImGui.TextColored(new Vector4(1, 0, 0, 1), fileDialogError);
+            ImGui.EndDisabled();
 
             ImGui.End();
         }
-    }
-
-    static void Reset()
-    {
-        fileSelectIndex = 0;
-        folderSelectIndex = 0;
-        currentFile = string.Empty;
-        currentFolder = string.Empty;
-        fileDialogError = string.Empty;
-        newFolderError = string.Empty;
-        newFileError = string.Empty;
     }
 
     static void ToggleSort(ref SortOrder target, ref SortOrder a, ref SortOrder b, ref SortOrder c)
@@ -367,12 +357,6 @@ public static class FileDialog
             files = files.OrderBy(f => f.LastWriteTime).ToList();
             if (dateSortOrder == SortOrder.Down) files.Reverse();
         }
-    }
-
-    public enum DialogType
-    {
-        OpenFile,
-        SelectFolder
     }
 
     public enum SortOrder
