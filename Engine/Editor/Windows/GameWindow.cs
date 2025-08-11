@@ -17,8 +17,8 @@ public static unsafe class GameWindow
         // render to framebuffer
         GameRenderWindow.framebuffer.Resize(ImGui.GetContentRegionAvail());
         GameRenderWindow.framebuffer.Bind();
-        GameRenderWindow.framebuffer.Clear(Color.DarkGray);
-        var cam = Scene.Current.FindAnyCamera();
+        GameRenderWindow.framebuffer.Clear(Scene.Current.FindCamera().clearColor);
+        var cam = Scene.Current.FindCamera();
         SceneManager.RenderSceneObjects(deltaTime, cam.view, cam.proj);
         GameRenderWindow.framebuffer.Unbind();
 

@@ -18,7 +18,7 @@ public class Scene : IDisposable
         foreach (var gameObject in gameObjects) gameObject.Dispose();
     }
 
-    public Camera FindAnyCamera()
+    public Camera FindCamera()
     {
         foreach (var gameObject in gameObjects)
         {

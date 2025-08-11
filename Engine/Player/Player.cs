@@ -44,9 +44,9 @@ public static class Player
         NativeWindow.opengl.Enable(EnableCap.DepthTest);
         NativeWindow.opengl.Enable(EnableCap.Blend);
         NativeWindow.opengl.BlendFunc(GLEnum.SrcAlpha, GLEnum.OneMinusSrcAlpha);
-        NativeWindow.opengl.ClearColor(Color.DarkGray);
+        NativeWindow.opengl.ClearColor(Scene.Current.FindCamera().clearColor);
         NativeWindow.opengl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-        SceneManager.RenderSceneObjects((float)deltaTime, Scene.Current.FindAnyCamera().view, Scene.Current.FindAnyCamera().proj);
+        SceneManager.RenderSceneObjects((float)deltaTime, Scene.Current.FindCamera().view, Scene.Current.FindCamera().proj);
     }
 
     static void ResizeWindow(Vector2D<int> size)
