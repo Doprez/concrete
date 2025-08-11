@@ -50,8 +50,8 @@ public static class ProjectManager
         string projectfilepath = Path.Combine(tempProjectPath, "project.json");
         ProjectSerializer.NewProjectFile(projectfilepath);
         LoadProjectFile(projectfilepath, true);
-        Directory.CreateDirectory("Scenes");
-        Directory.CreateDirectory("Scripts");
+        Directory.CreateDirectory(Path.Combine(tempProjectPath, "Scenes"));
+        Directory.CreateDirectory(Path.Combine(tempProjectPath, "Scripts"));
     }
 
     // ----
