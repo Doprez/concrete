@@ -90,6 +90,8 @@ public static class ProjectManager
             File.WriteAllText(memoryFilePath, path);
             Console.WriteLine("Remembered the newly loaded project.");
         }
+
+        AfterProjectLoad(Path.GetDirectoryName(path));
     }
 
     // ----
@@ -148,6 +150,12 @@ public static class ProjectManager
             File.WriteAllText(memoryFilePath, filepath);
             Console.WriteLine("Remembered the newly loaded project.");
         }
+
+        // rebuild shared ref for scripts
+        AfterProjectLoad(dir);
+
+        // make sure gitignore exists
+
     }
 
     private static void CopyDirectory(string source, string dest)
@@ -171,5 +179,20 @@ public static class ProjectManager
             string dubdirdest = Path.Combine(dest, Path.GetFileName(subdir));
             CopyDirectory(subdir, dubdirdest);
         }
+    }
+
+    // ----
+
+    static void AfterProjectLoad(string dir)
+    {
+        // rebuild shared ref for scripts
+        string csproj = Path.Combine(dir, "project.csproj");
+        if (File.Exists(csproj)) File.Delete(csproj);
+        Dotnet.New(csproj);
+        Dotnet.AddDll(csproj, Path.GetFullPath("Shared.dll"));
+
+        // make sure gitignore exists
+        string gitignore = Path.Combine(dir, ".gitignore");
+        if (!File.Exists(gitignore)) File.WriteAllText(gitignore, "bin/\nobj/\nproject.csproj");
     }
 }

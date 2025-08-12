@@ -14,6 +14,9 @@ public static unsafe class FilesWindow
 
     public static bool hovered = false;
 
+    static string[] fileRenderExclusions = [".guid", ".csproj"];
+    static string[] folderRenderExclusions = ["bin", "obj"];
+
     public static void Draw(float deltaTime)
     {
         hoveredFileOrDir = null;
@@ -196,10 +199,14 @@ public static unsafe class FilesWindow
             void RenderDirectoryInsides(string currentPath)
             {
                 string[] dirs = Directory.GetDirectories(currentPath);
-                for (int i = 0; i < dirs.Length; i++) RenderDirectoryAndInsides(dirs[i]);
+                for (int i = 0; i < dirs.Length; i++)
+                {
+                    string name = Path.GetFileName(dirs[i]);
+                    if (!folderRenderExclusions.Contains(name)) RenderDirectoryAndInsides(dirs[i]);
+                }
 
                 string[] files = Directory.GetFiles(currentPath);
-                for (int i = 0; i < files.Length; i++) if (Path.GetExtension(files[i]) != ".guid") RenderFile(files[i]);
+                for (int i = 0; i < files.Length; i++) if (!fileRenderExclusions.Contains(Path.GetExtension(files[i]))) RenderFile(files[i]);
             }
         }
 
