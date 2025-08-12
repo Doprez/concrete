@@ -1,3 +1,6 @@
+*.csproj
 bin/
 obj/
-project.csproj
+.idea/
+.vscode/
+.vs/
