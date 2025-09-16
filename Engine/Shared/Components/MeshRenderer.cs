@@ -12,6 +12,8 @@ public class MeshRenderer : Component
     private bool skinned = false;
     private SceneInstance instance;
 
+    public ArmatureInstance AnimationArmature => instance.Armature;
+
     [Show] [Include]
     public ModelGuid model
     {
