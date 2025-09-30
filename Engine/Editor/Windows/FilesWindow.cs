@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using System.Text;
 
@@ -139,6 +140,12 @@ public static unsafe class FilesWindow
                 if (ImGui.IsItemHovered()) hoveredFileOrDir = path;
 
                 if (ImGui.IsItemHovered() && ImGui.IsMouseClicked(0)) selectedFileOrDir = path;
+
+                if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(0))
+                {
+                    if (Shell.IsCommandInPath("code")) Shell.Run("code", $"{ProjectManager.projectRoot} {path}");
+                    else if (Shell.IsCommandInPath("notepad")) Shell.Run("notepad", path);
+                }
 
                 if (ImGui.BeginDragDropSource())
                 {
