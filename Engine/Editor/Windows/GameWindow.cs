@@ -42,6 +42,7 @@ public static unsafe class GameWindow
             ImGui.BeginDisabled(playing || paused);
             if (ImGui.Button("play", buttonsize))
             {
+                ScriptManager.RecompileScripts(ProjectManager.projectRoot);
                 SceneManager.StartPlaying();
                 ImGuiP.FocusWindow(ImGuiP.FindWindowByName("Game"), ImGuiFocusRequestFlags.None);
             }
