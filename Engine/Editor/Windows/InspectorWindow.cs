@@ -54,6 +54,27 @@ public static unsafe class InspectorWindow
             int width = (int)ImGui.GetContentRegionAvail().X;
             if (ImGui.Button("add component", new Vector2(width, 0))) ImGui.OpenPopup("ChooseComponent");
 
+            // script drag and drop area
+            ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
+            if (ImGui.BeginDragDropTarget())
+            {
+                var payload = ImGui.AcceptDragDropPayload("file_path");
+                if (!payload.IsNull)
+                {
+                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
+                    string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
+                    string extension = Path.GetExtension(relative);
+
+                    // if file is script
+                    if (extension == ".cs")
+                    {
+                        var type = ScriptManager.GetClassTypeOfScript(file);
+                        HierarchyWindow.selectedGameObject.AddComponentOfType(type);
+                    }
+                }
+                ImGui.EndDragDropTarget();
+            }
+
             // add component popup
             int selectedIndex = -1;
             if (ImGui.BeginPopup("ChooseComponent"))
