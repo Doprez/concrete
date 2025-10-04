@@ -15,10 +15,10 @@
 
 - unity inspired structure
 - component based architecture
-- powerfull imgui based editor
+- minimal imgui based editor
 - lightweight opengl renderer
-- complete gltf support
 - skinned mesh rendering
+- complete gltf support
 
 ## Example
 ```csharp
