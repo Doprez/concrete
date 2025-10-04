@@ -124,12 +124,14 @@ public static unsafe class FilesWindow
             {
                 if (ImGui.MenuItem("New Folder"))
                 {
-                    string newfolderpath = Path.Combine(ProjectManager.projectRoot, "folder");
+                    string parentfolder = root;
+                    string newfolderpath = parentfolder + "/folder";
                     for (int i = 0; i < 20; i++)
                     {
-                        if (Directory.Exists(newfolderpath)) newfolderpath = newfolderpath + $" ({i})";
+                        if (Directory.Exists(newfolderpath)) newfolderpath = parentfolder + "/folder (" + i.ToString() + ")";
                         else break;
                     }
+
                     Directory.CreateDirectory(newfolderpath);
                     AssetDatabase.Rebuild();
                 }
@@ -195,12 +197,14 @@ public static unsafe class FilesWindow
 
                     if (ImGui.MenuItem("New Folder"))
                     {
-                        string newfolderpath = path + "/folder";
+                        string parentfolder = path;
+                        string newfolderpath = parentfolder + "/folder";
                         for (int i = 0; i < 20; i++)
                         {
-                            if (Directory.Exists(newfolderpath)) newfolderpath = newfolderpath + $" ({i})";
+                            if (Directory.Exists(newfolderpath)) newfolderpath = parentfolder + "/folder (" + i.ToString() + ")";
                             else break;
                         }
+
                         Directory.CreateDirectory(newfolderpath);
                         AssetDatabase.Rebuild();
                     }
