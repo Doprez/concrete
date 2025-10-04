@@ -120,6 +120,23 @@ public static unsafe class FilesWindow
             string info = DragAndDrop.TargetString("file_path");
             if (info != null) movequeue.Add((info, ProjectManager.projectRoot));
 
+            if (ImGui.BeginPopupContextItem("FolderRightClickMenu"))
+            {
+                if (ImGui.MenuItem("New Folder"))
+                {
+                    string newfolderpath = Path.Combine(ProjectManager.projectRoot, "folder");
+                    for (int i = 0; i < 20; i++)
+                    {
+                        if (Directory.Exists(newfolderpath)) newfolderpath = newfolderpath + $" ({i})";
+                        else break;
+                    }
+                    Directory.CreateDirectory(newfolderpath);
+                    AssetDatabase.Rebuild();
+                }
+
+                ImGui.EndPopup();
+            }
+
             void RenderFile(string path)
             {
                 var fileflags = ImGuiTreeNodeFlags.Leaf | ImGuiTreeNodeFlags.NoTreePushOnOpen;
@@ -128,6 +145,17 @@ public static unsafe class FilesWindow
                 string endname = Path.GetFileName(path);
                 ImGui.PushID(path);
                 ImGui.TreeNodeEx(endname, fileflags);
+
+                if (ImGui.BeginPopupContextItem("FileRightClickMenu"))
+                {
+                    if (ImGui.MenuItem("Delete"))
+                    {
+                        if (File.Exists(path)) File.Delete(path);
+                        if (selectedFileOrDir == path) selectedFileOrDir = null;
+                        AssetDatabase.Rebuild();
+                    }
+                    ImGui.EndPopup();
+                }
 
                 if (ImGui.IsItemHovered()) hoveredFileOrDir = path;
 
@@ -156,6 +184,30 @@ public static unsafe class FilesWindow
 
                 bool open = ImGui.TreeNodeEx(endname, dirflags);
 
+                if (ImGui.BeginPopupContextItem("FolderRightClickMenu"))
+                {
+                    if (ImGui.MenuItem("Delete"))
+                    {
+                        if (Directory.Exists(path)) Directory.Delete(path, true);
+                        if (selectedFileOrDir == path) selectedFileOrDir = null;
+                        AssetDatabase.Rebuild();
+                    }
+
+                    if (ImGui.MenuItem("New Folder"))
+                    {
+                        string newfolderpath = path + "/folder";
+                        for (int i = 0; i < 20; i++)
+                        {
+                            if (Directory.Exists(newfolderpath)) newfolderpath = newfolderpath + $" ({i})";
+                            else break;
+                        }
+                        Directory.CreateDirectory(newfolderpath);
+                        AssetDatabase.Rebuild();
+                    }
+
+                    ImGui.EndPopup();
+                }
+
                 if (ImGui.IsItemHovered()) hoveredFileOrDir = path;
 
                 if (ImGui.IsItemClicked()) selectedFileOrDir = path;
@@ -177,6 +229,8 @@ public static unsafe class FilesWindow
 
             void RenderDirectoryInsides(string currentPath)
             {
+                if (!Directory.Exists(currentPath)) return;
+
                 string[] dirs = Directory.GetDirectories(currentPath);
                 for (int i = 0; i < dirs.Length; i++)
                 {
