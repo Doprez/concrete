@@ -7,7 +7,8 @@
 ![lines](https://sloc.xyz/github/sjoerdev/concrete/?lower=true)
 ![stars](https://img.shields.io/github/stars/sjoerdev/concrete?style=flat)
 ![version](https://img.shields.io/github/v/release/sjoerdev/concrete?include_prereleases)
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+![license](https://img.shields.io/github/license/sjoerdev/concrete?color=blue)
+
 
 </div>
 
