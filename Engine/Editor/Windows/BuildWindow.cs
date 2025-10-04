@@ -132,8 +132,8 @@ public static class BuildWindow
         string errors = process.StandardError.ReadToEnd();
         process.WaitForExit();
 
-        Console.WriteLine(output);
-        if (!string.IsNullOrWhiteSpace(errors)) Console.WriteLine("Errors: " + errors);
+        Debug.Log(output);
+        if (!string.IsNullOrWhiteSpace(errors)) Debug.Log("Errors: " + errors);
     }
 
     public static void CopyDirectory(string source, string dest)

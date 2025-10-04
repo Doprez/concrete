@@ -31,7 +31,15 @@ public static unsafe class ConsoleWindow
         for (int index = 0; index < history.Count; index++)
         {
             string line = history[index];
-            if (line.ToLower().Contains(consoleSearchPrompt.ToLower())) if (ImGui.Selectable(line)) ImGui.SetClipboardText(line);
+            if (line.ToLower().Contains(consoleSearchPrompt.ToLower()))
+            {
+                ImGui.PushID(index);
+                if (ImGui.Selectable(line))
+                {
+                    ImGui.SetClipboardText(line);
+                }
+                ImGui.PopID();
+            }
         }
 
         // ImGui.SetScrollY(ImGui.GetScrollMaxY());

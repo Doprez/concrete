@@ -20,8 +20,8 @@ public static class Dotnet
         string errors = process.StandardError.ReadToEnd();
         process.WaitForExit();
 
-        // if (!string.IsNullOrWhiteSpace(output)) Console.WriteLine("Output: " + output);
-        if (!string.IsNullOrWhiteSpace(errors)) Console.WriteLine("Errors: " + errors);
+        // if (!string.IsNullOrWhiteSpace(output)) Debug.Log("Output: " + output);
+        if (!string.IsNullOrWhiteSpace(errors)) Debug.Log("Errors: " + errors);
     }
 
     public static void New(string projectPath)

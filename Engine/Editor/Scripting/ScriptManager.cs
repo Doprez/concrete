@@ -28,26 +28,26 @@ public static class ScriptManager
 
         if (scriptPaths.Count == 0)
         {
-            Console.WriteLine("No scripts found to compile.");
+            Debug.Log("No scripts found to compile.");
             cachedAssembly = null;
             return null;
         }
 
-        Console.WriteLine($"Compiling {scriptPaths.Count} script(s)...");
+        Debug.Log($"Compiling {scriptPaths.Count} script(s)...");
 
         var compiledAssembly = ScriptCompiler.CompileScripts(scriptPaths, out var errors, out var dllbytes);
 
         if (compiledAssembly == null)
         {
-            Console.WriteLine($"Script compilation failed with {errors.Count} errors");
-            foreach (var error in errors) Console.WriteLine(error.ToString());
+            Debug.Log($"Script compilation failed with {errors.Count} errors");
+            foreach (var error in errors) Debug.Log(error.ToString());
             cachedAssembly = null;
             return null;
         }
 
         cachedAssembly = compiledAssembly;
 
-        Console.WriteLine("Scripts compiled and loaded successfully.");
+        Debug.Log("Scripts compiled and loaded successfully.");
 
         return dllbytes;
     }

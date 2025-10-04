@@ -16,31 +16,31 @@ public static class ProjectManager
     {
         if (File.Exists(memoryFilePath))
         {
-            Console.WriteLine("Memory file found.");
+            Debug.Log("Memory file found.");
             
             string memoryProjectPath = File.ReadAllText(memoryFilePath);
             
             if (File.Exists(memoryProjectPath))
             {
-                Console.WriteLine("Memory file contained a valid project.");
+                Debug.Log("Memory file contained a valid project.");
                 LoadProjectFile(memoryProjectPath);
             }
             else
             {
-                Console.WriteLine("Memory file did not contain a valid project.");
+                Debug.Log("Memory file did not contain a valid project.");
                 CreateAndLoadTempProject();
             }
         }
         else
         {
-            Console.WriteLine("No memory file found.");
+            Debug.Log("No memory file found.");
             CreateAndLoadTempProject();
         }
     }
 
     public static void CreateAndLoadTempProject()
     {
-        Console.WriteLine("Creating and loading a temporary project.");
+        Debug.Log("Creating and loading a temporary project.");
 
         // make empty temp project directory
         if (Directory.Exists(tempProjectPath)) Directory.Delete(tempProjectPath, true);
@@ -88,7 +88,7 @@ public static class ProjectManager
             // remember project
             if (File.Exists(memoryFilePath)) File.Delete(memoryFilePath);
             File.WriteAllText(memoryFilePath, path);
-            Console.WriteLine("Remembered the newly loaded project.");
+            Debug.Log("Remembered the newly loaded project.");
         }
 
         AfterProjectLoad(Path.GetDirectoryName(path));
@@ -114,7 +114,7 @@ public static class ProjectManager
         }
         else
         {
-            Console.WriteLine("Project is already up to date.");
+            Debug.Log("Project is already up to date.");
         }
     }
 
@@ -148,7 +148,7 @@ public static class ProjectManager
             // remember project
             if (File.Exists(memoryFilePath)) File.Delete(memoryFilePath);
             File.WriteAllText(memoryFilePath, filepath);
-            Console.WriteLine("Remembered the newly loaded project.");
+            Debug.Log("Remembered the newly loaded project.");
         }
 
         // rebuild shared ref for scripts

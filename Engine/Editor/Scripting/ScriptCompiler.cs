@@ -30,7 +30,7 @@ public static class ScriptCompiler
         string sharedAssemblyPath = Path.Combine(executableDirectory, "Shared.dll");
         if (!File.Exists(sharedAssemblyPath))
         {
-            Console.WriteLine($"Error: Shared.dll not found at '{sharedAssemblyPath}'");
+            Debug.Log($"Error: Shared.dll not found at '{sharedAssemblyPath}'");
             return null;
         }
         var sharedAssemblyReference = MetadataReference.CreateFromFile(sharedAssemblyPath);
