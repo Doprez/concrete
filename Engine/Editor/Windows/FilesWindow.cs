@@ -117,16 +117,8 @@ public static unsafe class FilesWindow
             RenderDirectoryInsides(root);
 
             ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
-            if (ImGui.BeginDragDropTarget())
-            {
-                var payload = ImGui.AcceptDragDropPayload("file_path");
-                if (!payload.IsNull)
-                {
-                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
-                    movequeue.Add((file, ProjectManager.projectRoot));
-                }
-                ImGui.EndDragDropTarget();
-            }
+            string info = DragAndDrop.TargetString("file_path");
+            if (info != null) movequeue.Add((info, ProjectManager.projectRoot));
 
             void RenderFile(string path)
             {
@@ -147,13 +139,7 @@ public static unsafe class FilesWindow
                     else if (Shell.IsCommandInPath("notepad")) Shell.Run("notepad", path);
                 }
 
-                if (ImGui.BeginDragDropSource())
-                {
-                    byte[] payload = Encoding.UTF8.GetBytes(path);
-                    fixed (byte* ptr = payload) ImGui.SetDragDropPayload("file_path", ptr, (nuint)payload.Length);
-                    ImGui.Text(endname);
-                    ImGui.EndDragDropSource();
-                }
+                DragAndDrop.SourceString("file_path", path, endname);
 
                 ImGui.PopID();
             }
@@ -174,24 +160,10 @@ public static unsafe class FilesWindow
 
                 if (ImGui.IsItemClicked()) selectedFileOrDir = path;
 
-                if (ImGui.BeginDragDropSource())
-                {
-                    byte[] payload = Encoding.UTF8.GetBytes(path);
-                    fixed (byte* ptr = payload) ImGui.SetDragDropPayload("file_path", ptr, (nuint)payload.Length);
-                    ImGui.Text(endname);
-                    ImGui.EndDragDropSource();
-                }
+                DragAndDrop.SourceString("file_path", path, endname);
 
-                if (ImGui.BeginDragDropTarget())
-                {
-                    var payload = ImGui.AcceptDragDropPayload("file_path");
-                    if (!payload.IsNull)
-                    {
-                        string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
-                        movequeue.Add((file, path));
-                    }
-                    ImGui.EndDragDropTarget();
-                }
+                string info = DragAndDrop.TargetString("file_path");
+                if (info != null) movequeue.Add((info, path));
 
                 if (open)
                 {

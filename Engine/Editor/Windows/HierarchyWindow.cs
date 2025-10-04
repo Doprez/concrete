@@ -42,23 +42,20 @@ public static unsafe class HierarchyWindow
 
         foreach (var gameObject in Scene.Current.gameObjects) if (gameObject.transform.parent == null) DrawHierarchyMember(gameObject);
         ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
-        if (ImGui.BeginDragDropTarget())
+        Guid? guid = DragAndDrop.TargetGuid("gameobject_guid");
+        if (guid != null)
         {
-            var payload = ImGui.AcceptDragDropPayload("gameobject_guid");
-            if (!payload.IsNull)
-            {
-                var dragged = Scene.Current.FindGameObject(*(Guid*)payload.Data);
-                if (dragged != null) reparentque.Add((dragged, null));
-            }
-            ImGui.EndDragDropTarget();
+            var dragged = Scene.Current.FindGameObject(guid.Value);
+            if (dragged != null) reparentque.Add((dragged, null));
         }
+
         ImGui.End();
     }
 
     private static void DrawHierarchyMember(GameObject gameObject)
     {
-        Guid id = gameObject.guid;
-        ImGui.PushID(id.ToString());
+        Guid guid = gameObject.guid;
+        ImGui.PushID(guid.ToString());
 
         var flags = ImGuiTreeNodeFlags.OpenOnArrow;
         if (gameObject.transform.children.Count == 0) flags |= ImGuiTreeNodeFlags.Leaf;
@@ -66,22 +63,13 @@ public static unsafe class HierarchyWindow
         bool open = ImGui.TreeNodeEx(gameObject.name, flags);
         if (ImGui.IsItemClicked() && !ImGui.IsItemToggledOpen()) selectedGameObject = gameObject;
 
-        if (ImGui.BeginDragDropSource())
+        DragAndDrop.SourceGuid("gameobject_guid", guid, gameObject.name);
+
+        Guid? dragged_guid = DragAndDrop.TargetGuid("gameobject_guid");
+        if (dragged_guid != null)
         {
-            ImGui.SetDragDropPayload("gameobject_guid", &id, (nuint)sizeof(Guid));
-            ImGui.Text(gameObject.name);
-            ImGui.EndDragDropSource();
-        }
-        
-        if (ImGui.BeginDragDropTarget())
-        {
-            var payload = ImGui.AcceptDragDropPayload("gameobject_guid");
-            if (!payload.IsNull)
-            {
-                var dragged = Scene.Current.FindGameObject(*(Guid*)payload.Data);
-                if (dragged != null && !dragged.transform.children.Contains(gameObject.transform)) reparentque.Add((dragged, gameObject));
-            }
-            ImGui.EndDragDropTarget();
+            var dragged = Scene.Current.FindGameObject(dragged_guid.Value);
+            if (dragged != null && !dragged.transform.children.Contains(gameObject.transform)) reparentque.Add((dragged, gameObject));
         }
 
         if (open)

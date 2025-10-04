@@ -56,23 +56,18 @@ public static unsafe class InspectorWindow
 
             // script drag and drop area
             ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
-            if (ImGui.BeginDragDropTarget())
+            string file = DragAndDrop.TargetString("file_path");
+            if (file != null)
             {
-                var payload = ImGui.AcceptDragDropPayload("file_path");
-                if (!payload.IsNull)
-                {
-                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
-                    string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
-                    string extension = Path.GetExtension(relative);
+                string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
+                string extension = Path.GetExtension(relative);
 
-                    // if file is script
-                    if (extension == ".cs")
-                    {
-                        var type = ScriptManager.GetClassTypeOfScript(file);
-                        HierarchyWindow.selectedGameObject.AddComponentOfType(type);
-                    }
+                // if file is script
+                if (extension == ".cs")
+                {
+                    var type = ScriptManager.GetClassTypeOfScript(file);
+                    HierarchyWindow.selectedGameObject.AddComponentOfType(type);
                 }
-                ImGui.EndDragDropTarget();
             }
 
             // add component popup
@@ -209,25 +204,19 @@ public static unsafe class InspectorWindow
             ImGui.InputText(nametoshow, ref display, 100, ImGuiInputTextFlags.ReadOnly);
 
             // drag and dropping
-            if (ImGui.BeginDragDropTarget())
+            string file = DragAndDrop.TargetString("file_path");
+            if (file != null)
             {
-                // if drag and drop is asset
-                var payload = ImGui.AcceptDragDropPayload("file_path");
-                if (!payload.IsNull)
-                {
-                    string file = Encoding.UTF8.GetString((byte*)payload.Data, payload.DataSize);
-                    string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
-                    string extension = Path.GetExtension(relative);
+                string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
+                string extension = Path.GetExtension(relative);
 
-                    // if asset is model
-                    if (extension == ".glb" || extension == ".gltf")
-                    {
-                        var new_model_ref = new ModelGuid();
-                        new_model_ref.guid = AssetDatabase.GetGuid(relative);
-                        SetMemberValue(new_model_ref);
-                    }
+                // if asset is model
+                if (extension == ".glb" || extension == ".gltf")
+                {
+                    var new_model_ref = new ModelGuid();
+                    new_model_ref.guid = AssetDatabase.GetGuid(relative);
+                    SetMemberValue(new_model_ref);
                 }
-                ImGui.EndDragDropTarget();
             }
         }
         else if (type == typeof(GameObjectGuid))
@@ -250,24 +239,16 @@ public static unsafe class InspectorWindow
             ImGui.InputText(nametoshow, ref display, 100, ImGuiInputTextFlags.ReadOnly);
 
             // drag and dropping
-            if (ImGui.BeginDragDropTarget())
+            Guid? new_gobj_guid = DragAndDrop.TargetGuid("gameobject_guid");
+            if (new_gobj_guid != null)
             {
-                // if drag and drop is gameobject guid
-                var payload = ImGui.AcceptDragDropPayload("gameobject_guid");
-                if (!payload.IsNull)
+                var new_gobj = Scene.Current.FindGameObject(new_gobj_guid.Value);
+                if (new_gobj != null)
                 {
-                    var new_gobj_guid = *(Guid*)payload.Data;
-                    var new_gobj = Scene.Current.FindGameObject(new_gobj_guid);
-
-                    // if gameobject exists
-                    if (new_gobj != null)
-                    {
-                        var new_gobj_ref = new GameObjectGuid();
-                        new_gobj_ref.guid = new_gobj_guid;
-                        SetMemberValue(new_gobj_ref);
-                    }
+                    var new_gobj_ref = new GameObjectGuid();
+                    new_gobj_ref.guid = new_gobj_guid.Value;
+                    SetMemberValue(new_gobj_ref);
                 }
-                ImGui.EndDragDropTarget();
             }
         }
 
