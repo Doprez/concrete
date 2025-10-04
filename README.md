@@ -9,18 +9,16 @@
 ![version](https://img.shields.io/github/v/release/sjoerdev/concrete?include_prereleases)
 ![license](https://img.shields.io/github/license/sjoerdev/concrete?color=blue)
 
-
 </div>
 
 ## Features
 
 - unity inspired structure
 - component based architecture
-- simple imgui based editor
-- simple opengl renderer
+- powerfull imgui based editor
+- lightweight opengl renderer
 - complete gltf support
 - skinned mesh rendering
-- skeletal animation
 
 ## Example
 ```csharp
