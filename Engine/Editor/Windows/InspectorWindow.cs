@@ -100,6 +100,8 @@ public static unsafe class InspectorWindow
 
     public static void DrawComponent(Component component)
     {
+        ImGui.PushID(component.gameObject.components.IndexOf(component));
+
         var type = component.GetType();
         
         var flags = ImGuiTreeNodeFlags.None;
@@ -123,6 +125,8 @@ public static unsafe class InspectorWindow
             visible = true;
             removeComponentQue.Add(component);
         }
+
+        ImGui.PopID();
     }
 
     private static void DrawMember(MemberInfo member, Component component)
