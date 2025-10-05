@@ -18,6 +18,10 @@ public static unsafe class FilesWindow
     static string[] fileRenderExclusions = [".guid", ".csproj"];
     static string[] folderRenderExclusions = ["bin", "obj"];
 
+    static string newScriptName = "";
+    static bool openCreateScriptModalRequest = false;
+    static string newScriptParentDirectory;
+
     public static void Draw(float deltaTime)
     {
         hoveredFileOrDir = null;
@@ -120,7 +124,7 @@ public static unsafe class FilesWindow
             string info = DragAndDrop.TargetString("file_path");
             if (info != null) movequeue.Add((info, ProjectManager.projectRoot));
 
-            if (ImGui.BeginPopupContextItem("FolderRightClickMenu"))
+            if (ImGui.BeginPopupContextItem("EmptySpaceRightClickMenu"))
             {
                 if (ImGui.MenuItem("New Folder"))
                 {
@@ -134,6 +138,60 @@ public static unsafe class FilesWindow
 
                     Directory.CreateDirectory(newfolderpath);
                     AssetDatabase.Rebuild();
+                }
+
+                if (ImGui.MenuItem("New Script"))
+                {
+                    openCreateScriptModalRequest = true;
+                    newScriptParentDirectory = root;
+                }
+
+                ImGui.EndPopup();
+            }
+
+            if (openCreateScriptModalRequest)
+            {
+                ImGui.OpenPopup("Create Script");
+                openCreateScriptModalRequest = false;
+            }
+
+            // new script popup
+            ImGui.SetNextWindowSize(new Vector2(256, 0), ImGuiCond.FirstUseEver);
+            if (ImGui.BeginPopupModal("Create Script", ImGuiWindowFlags.NoResize))
+            {
+                ImGui.Text("Name:");
+                ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
+                ImGui.InputText("##scriptname", ref newScriptName, 100);
+
+                // create button
+                bool emptyName = string.IsNullOrWhiteSpace(newScriptName);
+                ImGui.BeginDisabled(emptyName);
+                if (ImGui.Button("Create"))
+                {
+                    var path = Path.Combine(newScriptParentDirectory, newScriptName + ".cs");
+
+                    for (int i = 0; i < 20; i++)
+                    {
+                        if (File.Exists(path)) path = Path.Combine(newScriptParentDirectory, newScriptName + $"_{i}" + ".cs");
+                        else break;
+                    }
+
+                    Debug.Log(path);
+                    File.Create(path);
+                    AssetDatabase.Rebuild();
+
+                    newScriptName = "";
+                    ImGui.CloseCurrentPopup();
+                }
+                ImGui.EndDisabled();
+
+                ImGui.SameLine();
+
+                // cancel button
+                if (ImGui.Button("Cancel"))
+                {
+                    newScriptName = "";
+                    ImGui.CloseCurrentPopup();
                 }
 
                 ImGui.EndPopup();
@@ -207,6 +265,12 @@ public static unsafe class FilesWindow
 
                         Directory.CreateDirectory(newfolderpath);
                         AssetDatabase.Rebuild();
+                    }
+
+                    if (ImGui.MenuItem("New Script"))
+                    {
+                        openCreateScriptModalRequest = true;
+                        newScriptParentDirectory = path;
                     }
 
                     ImGui.EndPopup();
