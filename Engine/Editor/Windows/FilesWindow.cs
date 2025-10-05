@@ -86,20 +86,8 @@ public static unsafe class FilesWindow
             ImGui.BeginDisabled(File.Exists(selectedFileOrDir)); // cant make a folder inside a file
             if (ImGui.Button("New Folder", fbuttonsize))
             {
-                // make folder in root if no dir is selected
-                string parentfolder = Directory.Exists(selectedFileOrDir) ? selectedFileOrDir : root;
-                string newfolderpath = parentfolder + "/folder";
-
-                // add number if folder name is already in use
-                for (int i = 0; i < 20; i++)
-                {
-                    if (Directory.Exists(newfolderpath)) newfolderpath = parentfolder + "/folder (" + i.ToString() + ")";
-                    else break;
-                }
-                
-                // create the folder
+                string newfolderpath = MakeFolderUnique(root, "folder");
                 Directory.CreateDirectory(newfolderpath);
-                
                 AssetDatabase.Rebuild();
             }
             ImGui.EndDisabled();
@@ -128,14 +116,7 @@ public static unsafe class FilesWindow
             {
                 if (ImGui.MenuItem("New Folder"))
                 {
-                    string parentfolder = root;
-                    string newfolderpath = parentfolder + "/folder";
-                    for (int i = 0; i < 20; i++)
-                    {
-                        if (Directory.Exists(newfolderpath)) newfolderpath = parentfolder + "/folder (" + i.ToString() + ")";
-                        else break;
-                    }
-
+                    string newfolderpath = MakeFolderUnique(root, "folder");
                     Directory.CreateDirectory(newfolderpath);
                     AssetDatabase.Rebuild();
                 }
@@ -167,19 +148,13 @@ public static unsafe class FilesWindow
                 bool emptyName = string.IsNullOrWhiteSpace(newScriptName);
                 ImGui.BeginDisabled(emptyName);
                 if (ImGui.Button("Create"))
-                {
-                    var path = Path.Combine(newScriptParentDirectory, newScriptName + ".cs");
-
-                    for (int i = 0; i < 20; i++)
-                    {
-                        if (File.Exists(path)) path = Path.Combine(newScriptParentDirectory, newScriptName + $"_{i}" + ".cs");
-                        else break;
-                    }
-
-                    Debug.Log(path);
-                    File.Create(path);
+                {                    
+                    string path = MakeFileUnique(newScriptParentDirectory, newScriptName, ".cs");
+                    string template = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "NewScriptTemplate.cs"));
+                    string templateWithName = template.Replace("InsertScriptName", newScriptName);
+                    File.WriteAllText(path, templateWithName);
                     AssetDatabase.Rebuild();
-
+                    
                     newScriptName = "";
                     ImGui.CloseCurrentPopup();
                 }
@@ -255,14 +230,7 @@ public static unsafe class FilesWindow
 
                     if (ImGui.MenuItem("New Folder"))
                     {
-                        string parentfolder = path;
-                        string newfolderpath = parentfolder + "/folder";
-                        for (int i = 0; i < 20; i++)
-                        {
-                            if (Directory.Exists(newfolderpath)) newfolderpath = parentfolder + "/folder (" + i.ToString() + ")";
-                            else break;
-                        }
-
+                        string newfolderpath = MakeFolderUnique(path, "folder");
                         Directory.CreateDirectory(newfolderpath);
                         AssetDatabase.Rebuild();
                     }
@@ -312,5 +280,31 @@ public static unsafe class FilesWindow
         }
 
         ImGui.End();
+    }
+
+    static string MakeFileUnique(string parentDir, string fileName, string extension)
+    {
+        var path = Path.Combine(parentDir, fileName + extension);
+
+        for (int i = 0; i < 100; i++)
+        {
+            if (File.Exists(path)) path = Path.Combine(parentDir, fileName + $"_{i}" + extension);
+            else break;
+        }
+
+        return path;
+    }
+
+    static string MakeFolderUnique(string parentDir, string folderName)
+    {
+        var path = Path.Combine(parentDir, folderName);
+
+        for (int i = 0; i < 100; i++)
+        {
+            if (Directory.Exists(path)) path = Path.Combine(parentDir, folderName + $"_{i}");
+            else break;
+        }
+
+        return path;
     }
 }
