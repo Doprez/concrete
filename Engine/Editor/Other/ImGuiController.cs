@@ -29,9 +29,10 @@ public unsafe class ImGuiController
     private uint vao;
     private uint vbo;
     private uint ebo;
-
-    private ImGuiTexture fontTexture;
+    
     private ImGuiShader shader;
+
+    // ImVector<byte> tempBuffer;
 
     private int width;
     private int height;
@@ -53,15 +54,20 @@ public unsafe class ImGuiController
         plotContext = ImPlot.CreateContext();
         UpdateContexts();
 
-        // set flags
-        ImGui.GetIO().BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
-        
+        // set backend flags
+        ImGui.GetIO().BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset | ImGuiBackendFlags.RendererHasTextures;
+
+        // set font flags
+        ImGui.GetIO().Fonts.Flags |= ImFontAtlasFlags.NoBakedLines;
+
         // set font
         if (font != null)
         {
             ImGui.GetIO().Fonts.Clear();
             ImGui.GetIO().Fonts.AddFontFromFileTTF(font, fontSize);
         }
+
+        // create device resources
         CreateDeviceResources();
 
         // initialize frame data
@@ -74,91 +80,6 @@ public unsafe class ImGuiController
 
         // custom theme setup
         SetupCustomTheme();
-    }
-
-    public static void SetupCustomTheme()
-    {
-        var style = ImGui.GetStyle();
-        
-        style.Alpha = 1.0f;
-        style.DisabledAlpha = 0.6f;
-        style.WindowPadding = new Vector2(8.0f, 8.0f);
-        style.WindowRounding = 4.0f;
-        style.WindowBorderSize = 1.0f;
-        style.ChildRounding = 4.0f;
-        style.ChildBorderSize = 1.0f;
-        style.PopupRounding = 4.0f;
-        style.PopupBorderSize = 1.0f;
-        style.FrameRounding = 4.0f;
-        style.FrameBorderSize = 1.0f;
-        style.ItemSpacing = new Vector2(8.0f, 4.0f);
-        style.ItemInnerSpacing = new Vector2(4.0f, 4.0f);
-        style.CellPadding = new Vector2(4.0f, 2.0f);
-        style.ScrollbarSize = 14.0f;
-        style.ScrollbarRounding = 4.0f;
-        style.GrabMinSize = 10.0f;
-        style.GrabRounding = 20.0f;
-        style.TabRounding = 4.0f;
-        style.TabBorderSize = 1.0f;
-        
-        style.Colors[(int)ImGuiCol.Text] = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-        style.Colors[(int)ImGuiCol.TextDisabled] = new Vector4(0.4980392158031464f, 0.4980392158031464f, 0.4980392158031464f, 1.0f);
-        style.Colors[(int)ImGuiCol.WindowBg] = new Vector4(0.1137254908680916f, 0.1137254908680916f, 0.1137254908680916f, 1.0f);
-        style.Colors[(int)ImGuiCol.ChildBg] = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
-        style.Colors[(int)ImGuiCol.PopupBg] = new Vector4(0.0784313753247261f, 0.0784313753247261f, 0.0784313753247261f, 0.9399999976158142f);
-        style.Colors[(int)ImGuiCol.Border] = new Vector4(1.0f, 1.0f, 1.0f, 0.1630901098251343f);
-        style.Colors[(int)ImGuiCol.BorderShadow] = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
-        style.Colors[(int)ImGuiCol.FrameBg] = new Vector4(0.08627451211214066f, 0.08627451211214066f, 0.08627451211214066f, 1.0f);
-        style.Colors[(int)ImGuiCol.FrameBgHovered] = new Vector4(0.1529411822557449f, 0.1529411822557449f, 0.1529411822557449f, 1.0f);
-        style.Colors[(int)ImGuiCol.FrameBgActive] = new Vector4(0.1882352977991104f, 0.1882352977991104f, 0.1882352977991104f, 1.0f);
-        style.Colors[(int)ImGuiCol.TitleBg] = new Vector4(0.1137254908680916f, 0.1137254908680916f, 0.1137254908680916f, 1.0f);
-        style.Colors[(int)ImGuiCol.TitleBgActive] = new Vector4(0.105882354080677f, 0.105882354080677f, 0.105882354080677f, 1.0f);
-        style.Colors[(int)ImGuiCol.TitleBgCollapsed] = new Vector4(0.0f, 0.0f, 0.0f, 0.5099999904632568f);
-        style.Colors[(int)ImGuiCol.MenuBarBg] = new Vector4(0.1137254908680916f, 0.1137254908680916f, 0.1137254908680916f, 1.0f);
-        style.Colors[(int)ImGuiCol.ScrollbarBg] = new Vector4(0.01960784383118153f, 0.01960784383118153f, 0.01960784383118153f, 0.5299999713897705f);
-        style.Colors[(int)ImGuiCol.ScrollbarGrab] = new Vector4(0.3098039329051971f, 0.3098039329051971f, 0.3098039329051971f, 1.0f);
-        style.Colors[(int)ImGuiCol.ScrollbarGrabHovered] = new Vector4(0.407843142747879f, 0.407843142747879f, 0.407843142747879f, 1.0f);
-        style.Colors[(int)ImGuiCol.ScrollbarGrabActive] = new Vector4(0.5098039507865906f, 0.5098039507865906f, 0.5098039507865906f, 1.0f);
-        style.Colors[(int)ImGuiCol.CheckMark] = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-        style.Colors[(int)ImGuiCol.SliderGrab] = new Vector4(0.8784313797950745f, 0.8784313797950745f, 0.8784313797950745f, 1.0f);
-        style.Colors[(int)ImGuiCol.SliderGrabActive] = new Vector4(0.9803921580314636f, 0.9803921580314636f, 0.9803921580314636f, 1.0f);
-        style.Colors[(int)ImGuiCol.Button] = new Vector4(0.1490196138620377f, 0.1490196138620377f, 0.1490196138620377f, 1.0f);
-        style.Colors[(int)ImGuiCol.ButtonHovered] = new Vector4(0.2470588237047195f, 0.2470588237047195f, 0.2470588237047195f, 1.0f);
-        style.Colors[(int)ImGuiCol.ButtonActive] = new Vector4(0.3294117748737335f, 0.3294117748737335f, 0.3294117748737335f, 1.0f);
-        style.Colors[(int)ImGuiCol.Header] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.3098039329051971f);
-        style.Colors[(int)ImGuiCol.HeaderHovered] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.800000011920929f);
-        style.Colors[(int)ImGuiCol.HeaderActive] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 1.0f);
-        style.Colors[(int)ImGuiCol.Separator] = new Vector4(0.4274509847164154f, 0.4274509847164154f, 0.4980392158031464f, 0.5f);
-        style.Colors[(int)ImGuiCol.SeparatorHovered] = new Vector4(0.7490196228027344f, 0.7490196228027344f, 0.7490196228027344f, 0.7803921699523926f);
-        style.Colors[(int)ImGuiCol.SeparatorActive] = new Vector4(0.7490196228027344f, 0.7490196228027344f, 0.7490196228027344f, 1.0f);
-        style.Colors[(int)ImGuiCol.ResizeGrip] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.2000000029802322f);
-        style.Colors[(int)ImGuiCol.ResizeGripHovered] = new Vector4(0.9372549057006836f, 0.9372549057006836f, 0.9372549057006836f, 0.6705882549285889f);
-        style.Colors[(int)ImGuiCol.ResizeGripActive] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.9490196108818054f);
-        
-        style.Colors[(int)ImGuiCol.Tab] = new Vector4(0.2235294133424759f, 0.2235294133424759f, 0.2235294133424759f, 0.8627451062202454f);
-        style.Colors[(int)ImGuiCol.TabHovered] = new Vector4(0.321568638086319f, 0.321568638086319f, 0.321568638086319f, 0.800000011920929f);
-        style.Colors[(int)ImGuiCol.TabDimmed] = new Vector4(0.1450980454683304f, 0.1450980454683304f, 0.1450980454683304f, 0.9725490212440491f);
-        style.Colors[(int)ImGuiCol.TabSelected] = new Vector4(0.4235294163227081f, 0.4235294163227081f, 0.4235294163227081f, 1.0f);
-        style.Colors[(int)ImGuiCol.TabDimmedSelected] = new Vector4(0.2745098173618317f, 0.2745098173618317f, 0.2745098173618317f, 1.0f);
-        
-        style.Colors[(int)ImGuiCol.TabSelectedOverline] = new Vector4(0.4235294163227081f, 0.4235294163227081f, 0.4235294163227081f, 1.0f);
-        style.Colors[(int)ImGuiCol.TabDimmedSelectedOverline] = new Vector4(0.4235294163227081f, 0.4235294163227081f, 0.4235294163227081f, 1.0f);
-
-        style.Colors[(int)ImGuiCol.PlotLines] = new Vector4(0.6078431606292725f, 0.6078431606292725f, 0.6078431606292725f, 1.0f);
-        style.Colors[(int)ImGuiCol.PlotLinesHovered] = new Vector4(1.0f, 0.4274509847164154f, 0.3490196168422699f, 1.0f);
-        style.Colors[(int)ImGuiCol.PlotHistogram] = new Vector4(0.8980392217636108f, 0.6980392336845398f, 0.0f, 1.0f);
-        style.Colors[(int)ImGuiCol.PlotHistogramHovered] = new Vector4(1.0f, 0.6000000238418579f, 0.0f, 1.0f);
-        style.Colors[(int)ImGuiCol.TableHeaderBg] = new Vector4(0.1882352977991104f, 0.1882352977991104f, 0.2000000029802322f, 1.0f);
-        style.Colors[(int)ImGuiCol.TableBorderStrong] = new Vector4(0.3098039329051971f, 0.3098039329051971f, 0.3490196168422699f, 1.0f);
-        style.Colors[(int)ImGuiCol.TableBorderLight] = new Vector4(0.2274509817361832f, 0.2274509817361832f, 0.2470588237047195f, 1.0f);
-        style.Colors[(int)ImGuiCol.TableRowBg] = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
-        style.Colors[(int)ImGuiCol.TableRowBgAlt] = new Vector4(1.0f, 1.0f, 1.0f, 0.05999999865889549f);
-        style.Colors[(int)ImGuiCol.TextSelectedBg] = new Vector4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 0.3499999940395355f);
-        style.Colors[(int)ImGuiCol.DragDropTarget] = new Vector4(1.0f, 1.0f, 0.0f, 0.8999999761581421f);
-        style.Colors[(int)ImGuiCol.NavCursor] = new Vector4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 1.0f);
-        style.Colors[(int)ImGuiCol.NavWindowingHighlight] = new Vector4(1.0f, 1.0f, 1.0f, 0.699999988079071f);
-        style.Colors[(int)ImGuiCol.NavWindowingDimBg] = new Vector4(0.800000011920929f, 0.800000011920929f, 0.800000011920929f, 0.2000000029802322f);
-        style.Colors[(int)ImGuiCol.ModalWindowDimBg] = new Vector4(0.800000011920929f, 0.800000011920929f, 0.800000011920929f, 0.3499999940395355f);
     }
 
     public void Update(float deltaTime)
@@ -238,6 +159,242 @@ public unsafe class ImGuiController
     internal void PressChar(char keyChar)
     {
         pressedchars.Add(keyChar);
+    }
+
+    private unsafe void SetupRenderState(ImDrawDataPtr drawDataPtr, int framebufferWidth, int framebufferHeight)
+    {
+        opengl.Enable(GLEnum.Blend);
+        opengl.BlendEquation(GLEnum.FuncAdd);
+        opengl.BlendFuncSeparate(GLEnum.SrcAlpha, GLEnum.OneMinusSrcAlpha, GLEnum.One, GLEnum.OneMinusSrcAlpha);
+        opengl.Disable(GLEnum.CullFace);
+        opengl.Disable(GLEnum.DepthTest);
+        opengl.Disable(GLEnum.StencilTest);
+        opengl.Enable(GLEnum.ScissorTest);
+
+        float L = drawDataPtr.DisplayPos.X;
+        float R = drawDataPtr.DisplayPos.X + drawDataPtr.DisplaySize.X;
+        float T = drawDataPtr.DisplayPos.Y;
+        float B = drawDataPtr.DisplayPos.Y + drawDataPtr.DisplaySize.Y;
+
+        Span<float> orthoProjection = 
+        [
+            2.0f / (R - L), 0.0f, 0.0f, 0.0f,
+            0.0f, 2.0f / (T - B), 0.0f, 0.0f,
+            0.0f, 0.0f, -1.0f, 0.0f,
+            (R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f,
+        ];
+
+        shader.UseShader();
+        opengl.Uniform1(alocTex, 0);
+        opengl.UniformMatrix4(alocProj, 1, false, orthoProjection);
+        opengl.BindSampler(0, 0);
+        
+        vao = opengl.GenVertexArray();
+        opengl.BindVertexArray(vao);
+
+        opengl.BindBuffer(GLEnum.ArrayBuffer, vbo);
+        opengl.BindBuffer(GLEnum.ElementArrayBuffer, ebo);
+        opengl.EnableVertexAttribArray((uint) alocPos);
+        opengl.EnableVertexAttribArray((uint) alocUv);
+        opengl.EnableVertexAttribArray((uint) alocColor);
+        opengl.VertexAttribPointer((uint) alocPos, 2, GLEnum.Float, false, (uint) sizeof(ImDrawVert), (void*) 0);
+        opengl.VertexAttribPointer((uint) alocUv, 2, GLEnum.Float, false, (uint) sizeof(ImDrawVert), (void*) 8);
+        opengl.VertexAttribPointer((uint) alocColor, 4, GLEnum.UnsignedByte, true, (uint) sizeof(ImDrawVert), (void*) 16);
+    }
+
+    void UpdateTexture(ImTextureDataPtr tex)
+    {
+        if (tex.Status == ImTextureStatus.WantCreate)
+        {
+            // remember state
+            opengl.GetInteger(GLEnum.TextureBinding2D, out int last_texture);
+            
+            // create texture based on the ImTextureData
+            uint gl_texture_id = opengl.GenTexture();
+            opengl.BindTexture(GLEnum.Texture2D, gl_texture_id);
+            opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMinFilter, (int)GLEnum.Linear);
+            opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureMagFilter, (int)GLEnum.Linear);
+            opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapS, (int)GLEnum.ClampToEdge);
+            opengl.TexParameter(GLEnum.Texture2D, GLEnum.TextureWrapT, (int)GLEnum.ClampToEdge);
+            opengl.PixelStore(GLEnum.UnpackRowLength, 0);
+            opengl.TexImage2D(GLEnum.Texture2D, 0, (int)GLEnum.Rgba, (uint)tex.Width, (uint)tex.Height, 0, GLEnum.Rgba, GLEnum.UnsignedByte, tex.GetPixels());
+
+            // store identifiers
+            tex.SetTexID(new ImTextureID(gl_texture_id));
+            tex.SetStatus(ImTextureStatus.Ok);
+
+            // restore state
+            opengl.BindTexture(GLEnum.Texture2D, (uint)last_texture);
+        }
+        else if (tex.Status == ImTextureStatus.WantUpdates)
+        {
+            // remember state
+            opengl.GetInteger(GLEnum.TextureBinding2D, out int last_texture);
+
+            // upload a rectangle of pixels to the existing texture
+            opengl.PixelStore(GLEnum.UnpackRowLength, tex.Width);
+            opengl.BindTexture(GLEnum.Texture2D, (uint)tex.GetTexID());
+            var rect = tex.UpdateRect;
+            opengl.TexSubImage2D(GLEnum.Texture2D, 0, rect.X, rect.Y, rect.W, rect.H, GLEnum.Rgba, GLEnum.UnsignedByte, tex.GetPixelsAt(rect.X, rect.Y));
+            opengl.PixelStore(GLEnum.UnpackRowLength, 0);
+
+            // set status
+            tex.SetStatus(ImTextureStatus.Ok);
+
+            // restore state
+            opengl.BindTexture(GLEnum.Texture2D, (uint)last_texture);
+        }
+        else if (tex.Status == ImTextureStatus.WantDestroy)
+        {
+            // destroy the texture
+            opengl.DeleteTexture((uint)tex.TexID.Handle);
+            tex.SetTexID(ImTextureID.Null);
+            tex.SetStatus(ImTextureStatus.Destroyed);
+        }
+    }
+
+    private unsafe void RenderImDrawData(ImDrawData* drawDataPtr)
+    {
+        int framebufferWidth = (int) (drawDataPtr->DisplaySize.X * drawDataPtr->FramebufferScale.X);
+        int framebufferHeight = (int) (drawDataPtr->DisplaySize.Y * drawDataPtr->FramebufferScale.Y);
+        if (framebufferWidth <= 0 || framebufferHeight <= 0) return;
+
+        // update the imgui textures
+        if (drawDataPtr->Textures != null)
+        {
+            for (int i = 0; i < drawDataPtr->Textures->Size; i++)
+            {
+                var textures_vector = *drawDataPtr->Textures;
+                var texture = textures_vector[i];
+                if (texture.Status != ImTextureStatus.Ok) UpdateTexture(texture);
+            }
+        }
+
+        opengl.GetInteger(GLEnum.ActiveTexture, out int lastActiveTexture);
+        opengl.ActiveTexture(GLEnum.Texture0);
+
+        opengl.GetInteger(GLEnum.CurrentProgram, out int lastProgram);
+        opengl.GetInteger(GLEnum.TextureBinding2D, out int lastTexture);
+        opengl.GetInteger(GLEnum.SamplerBinding, out int lastSampler);
+        opengl.GetInteger(GLEnum.ArrayBufferBinding, out int lastArrayBuffer);
+        opengl.GetInteger(GLEnum.VertexArrayBinding, out int lastVertexArrayObject);
+
+        Span<int> lastPolygonMode = stackalloc int[2];
+        opengl.GetInteger(GLEnum.PolygonMode, lastPolygonMode);
+        Span<int> lastScissorBox = stackalloc int[4];
+        opengl.GetInteger(GLEnum.ScissorBox, lastScissorBox);
+
+        opengl.GetInteger(GLEnum.BlendSrcRgb, out int lastBlendSrcRgb);
+        opengl.GetInteger(GLEnum.BlendDstRgb, out int lastBlendDstRgb);
+        opengl.GetInteger(GLEnum.BlendSrcAlpha, out int lastBlendSrcAlpha);
+        opengl.GetInteger(GLEnum.BlendDstAlpha, out int lastBlendDstAlpha);
+        opengl.GetInteger(GLEnum.BlendEquationRgb, out int lastBlendEquationRgb);
+        opengl.GetInteger(GLEnum.BlendEquationAlpha, out int lastBlendEquationAlpha);
+
+        bool lastEnableBlend = opengl.IsEnabled(GLEnum.Blend);
+        bool lastEnableCullFace = opengl.IsEnabled(GLEnum.CullFace);
+        bool lastEnableDepthTest = opengl.IsEnabled(GLEnum.DepthTest);
+        bool lastEnableStencilTest = opengl.IsEnabled(GLEnum.StencilTest);
+        bool lastEnableScissorTest = opengl.IsEnabled(GLEnum.ScissorTest);
+
+        SetupRenderState(drawDataPtr, framebufferWidth, framebufferHeight);
+
+        Vector2 clipOff = drawDataPtr->DisplayPos;
+        Vector2 clipScale = drawDataPtr->FramebufferScale;
+
+        for (int n = 0; n < drawDataPtr->CmdListsCount; n++)
+        {
+            ImDrawListPtr cmdListPtr = drawDataPtr->CmdLists.Data[n];
+
+            opengl.BufferData(GLEnum.ArrayBuffer, (nuint) (cmdListPtr.VtxBuffer.Size * sizeof(ImDrawVert)), (void*) cmdListPtr.VtxBuffer.Data, GLEnum.StreamDraw);
+            opengl.BufferData(GLEnum.ElementArrayBuffer, (nuint) (cmdListPtr.IdxBuffer.Size * sizeof(ushort)), (void*) cmdListPtr.IdxBuffer.Data, GLEnum.StreamDraw);
+
+            for (int cmd_i = 0; cmd_i < cmdListPtr.CmdBuffer.Size; cmd_i++)
+            {
+                ImDrawCmdPtr cmdPtr = &cmdListPtr.CmdBuffer.Data[cmd_i];
+
+                Vector4 clipRect;
+                clipRect.X = (cmdPtr.ClipRect.X - clipOff.X) * clipScale.X;
+                clipRect.Y = (cmdPtr.ClipRect.Y - clipOff.Y) * clipScale.Y;
+                clipRect.Z = (cmdPtr.ClipRect.Z - clipOff.X) * clipScale.X;
+                clipRect.W = (cmdPtr.ClipRect.W - clipOff.Y) * clipScale.Y;
+
+                if (clipRect.X < framebufferWidth && clipRect.Y < framebufferHeight && clipRect.Z >= 0.0f && clipRect.W >= 0.0f)
+                {
+                    opengl.Scissor((int) clipRect.X, (int) (framebufferHeight - clipRect.W), (uint) (clipRect.Z - clipRect.X), (uint) (clipRect.W - clipRect.Y));
+                    opengl.BindTexture(GLEnum.Texture2D, (uint)cmdPtr.GetTexID());
+                    opengl.DrawElementsBaseVertex(GLEnum.Triangles, cmdPtr.ElemCount, GLEnum.UnsignedShort, (void*) (cmdPtr.IdxOffset * sizeof(ushort)), (int) cmdPtr.VtxOffset);
+                }
+            }
+        }
+
+        opengl.DeleteVertexArray(vao);
+        vao = 0;
+
+        opengl.UseProgram((uint) lastProgram);
+        opengl.BindTexture(GLEnum.Texture2D, (uint) lastTexture);
+        opengl.BindSampler(0, (uint) lastSampler);
+        opengl.ActiveTexture((GLEnum) lastActiveTexture);
+        opengl.BindVertexArray((uint) lastVertexArrayObject);
+        opengl.BindBuffer(GLEnum.ArrayBuffer, (uint) lastArrayBuffer);
+        opengl.BlendEquationSeparate((GLEnum) lastBlendEquationRgb, (GLEnum) lastBlendEquationAlpha);
+        opengl.BlendFuncSeparate((GLEnum) lastBlendSrcRgb, (GLEnum) lastBlendDstRgb, (GLEnum) lastBlendSrcAlpha, (GLEnum) lastBlendDstAlpha);
+
+        if (lastEnableBlend) opengl.Enable(GLEnum.Blend);
+        else opengl.Disable(GLEnum.Blend);
+
+        if (lastEnableCullFace) opengl.Enable(GLEnum.CullFace);
+        else opengl.Disable(GLEnum.CullFace);
+
+        if (lastEnableDepthTest) opengl.Enable(GLEnum.DepthTest);
+        else opengl.Disable(GLEnum.DepthTest);
+
+        if (lastEnableStencilTest) opengl.Enable(GLEnum.StencilTest);
+        else opengl.Disable(GLEnum.StencilTest);
+
+        if (lastEnableScissorTest) opengl.Enable(GLEnum.ScissorTest);
+        else opengl.Disable(GLEnum.ScissorTest);
+
+        opengl.Scissor(lastScissorBox[0], lastScissorBox[1], (uint) lastScissorBox[2], (uint) lastScissorBox[3]);
+    }
+
+    private void CreateDeviceResources()
+    {
+        string vertexSource =
+        @"#version 330
+        layout (location = 0) in vec2 Position;
+        layout (location = 1) in vec2 UV;
+        layout (location = 2) in vec4 Color;
+        uniform mat4 ProjMtx;
+        out vec2 Frag_UV;
+        out vec4 Frag_Color;
+        void main()
+        {
+            Frag_UV = UV;
+            Frag_Color = Color;
+            gl_Position = ProjMtx * vec4(Position.xy,0,1);
+        }";
+
+        string fragmentSource =
+        @"#version 330
+        in vec2 Frag_UV;
+        in vec4 Frag_Color;
+        uniform sampler2D Texture;
+        layout (location = 0) out vec4 Out_Color;
+        void main()
+        {
+            Out_Color = Frag_Color * texture(Texture, Frag_UV.st);
+        }";
+
+        shader = new ImGuiShader(opengl, vertexSource, fragmentSource);
+        alocTex = shader.GetUniformLocation("Texture");
+        alocProj = shader.GetUniformLocation("ProjMtx");
+        alocPos = shader.GetAttribLocation("Position");
+        alocUv = shader.GetAttribLocation("UV");
+        alocColor = shader.GetAttribLocation("Color");
+
+        vbo = opengl.GenBuffer();
+        ebo = opengl.GenBuffer();
     }
 
     private ImGuiKey ToImGuiKey(Key key)
@@ -353,205 +510,89 @@ public unsafe class ImGuiController
         };
     }
 
-    private unsafe void SetupRenderState(ImDrawDataPtr drawDataPtr, int framebufferWidth, int framebufferHeight)
+    public static void SetupCustomTheme()
     {
-        opengl.Enable(GLEnum.Blend);
-        opengl.BlendEquation(GLEnum.FuncAdd);
-        opengl.BlendFuncSeparate(GLEnum.SrcAlpha, GLEnum.OneMinusSrcAlpha, GLEnum.One, GLEnum.OneMinusSrcAlpha);
-        opengl.Disable(GLEnum.CullFace);
-        opengl.Disable(GLEnum.DepthTest);
-        opengl.Disable(GLEnum.StencilTest);
-        opengl.Enable(GLEnum.ScissorTest);
-
-        float L = drawDataPtr.DisplayPos.X;
-        float R = drawDataPtr.DisplayPos.X + drawDataPtr.DisplaySize.X;
-        float T = drawDataPtr.DisplayPos.Y;
-        float B = drawDataPtr.DisplayPos.Y + drawDataPtr.DisplaySize.Y;
-
-        Span<float> orthoProjection = 
-        [
-            2.0f / (R - L), 0.0f, 0.0f, 0.0f,
-            0.0f, 2.0f / (T - B), 0.0f, 0.0f,
-            0.0f, 0.0f, -1.0f, 0.0f,
-            (R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f,
-        ];
-
-        shader.UseShader();
-        opengl.Uniform1(alocTex, 0);
-        opengl.UniformMatrix4(alocProj, 1, false, orthoProjection);
-        opengl.BindSampler(0, 0);
+        var style = ImGui.GetStyle();
         
-        vao = opengl.GenVertexArray();
-        opengl.BindVertexArray(vao);
+        style.Alpha = 1.0f;
+        style.DisabledAlpha = 0.6f;
+        style.WindowPadding = new Vector2(8.0f, 8.0f);
+        style.WindowRounding = 4.0f;
+        style.WindowBorderSize = 1.0f;
+        style.ChildRounding = 4.0f;
+        style.ChildBorderSize = 1.0f;
+        style.PopupRounding = 4.0f;
+        style.PopupBorderSize = 1.0f;
+        style.FrameRounding = 4.0f;
+        style.FrameBorderSize = 1.0f;
+        style.ItemSpacing = new Vector2(8.0f, 4.0f);
+        style.ItemInnerSpacing = new Vector2(4.0f, 4.0f);
+        style.CellPadding = new Vector2(4.0f, 2.0f);
+        style.ScrollbarSize = 14.0f;
+        style.ScrollbarRounding = 4.0f;
+        style.GrabMinSize = 10.0f;
+        style.GrabRounding = 20.0f;
+        style.TabRounding = 4.0f;
+        style.TabBorderSize = 1.0f;
+        
+        style.Colors[(int)ImGuiCol.Text] = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+        style.Colors[(int)ImGuiCol.TextDisabled] = new Vector4(0.4980392158031464f, 0.4980392158031464f, 0.4980392158031464f, 1.0f);
+        style.Colors[(int)ImGuiCol.WindowBg] = new Vector4(0.1137254908680916f, 0.1137254908680916f, 0.1137254908680916f, 1.0f);
+        style.Colors[(int)ImGuiCol.ChildBg] = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+        style.Colors[(int)ImGuiCol.PopupBg] = new Vector4(0.0784313753247261f, 0.0784313753247261f, 0.0784313753247261f, 0.9399999976158142f);
+        style.Colors[(int)ImGuiCol.Border] = new Vector4(1.0f, 1.0f, 1.0f, 0.1630901098251343f);
+        style.Colors[(int)ImGuiCol.BorderShadow] = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+        style.Colors[(int)ImGuiCol.FrameBg] = new Vector4(0.08627451211214066f, 0.08627451211214066f, 0.08627451211214066f, 1.0f);
+        style.Colors[(int)ImGuiCol.FrameBgHovered] = new Vector4(0.1529411822557449f, 0.1529411822557449f, 0.1529411822557449f, 1.0f);
+        style.Colors[(int)ImGuiCol.FrameBgActive] = new Vector4(0.1882352977991104f, 0.1882352977991104f, 0.1882352977991104f, 1.0f);
+        style.Colors[(int)ImGuiCol.TitleBg] = new Vector4(0.1137254908680916f, 0.1137254908680916f, 0.1137254908680916f, 1.0f);
+        style.Colors[(int)ImGuiCol.TitleBgActive] = new Vector4(0.105882354080677f, 0.105882354080677f, 0.105882354080677f, 1.0f);
+        style.Colors[(int)ImGuiCol.TitleBgCollapsed] = new Vector4(0.0f, 0.0f, 0.0f, 0.5099999904632568f);
+        style.Colors[(int)ImGuiCol.MenuBarBg] = new Vector4(0.1137254908680916f, 0.1137254908680916f, 0.1137254908680916f, 1.0f);
+        style.Colors[(int)ImGuiCol.ScrollbarBg] = new Vector4(0.01960784383118153f, 0.01960784383118153f, 0.01960784383118153f, 0.5299999713897705f);
+        style.Colors[(int)ImGuiCol.ScrollbarGrab] = new Vector4(0.3098039329051971f, 0.3098039329051971f, 0.3098039329051971f, 1.0f);
+        style.Colors[(int)ImGuiCol.ScrollbarGrabHovered] = new Vector4(0.407843142747879f, 0.407843142747879f, 0.407843142747879f, 1.0f);
+        style.Colors[(int)ImGuiCol.ScrollbarGrabActive] = new Vector4(0.5098039507865906f, 0.5098039507865906f, 0.5098039507865906f, 1.0f);
+        style.Colors[(int)ImGuiCol.CheckMark] = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+        style.Colors[(int)ImGuiCol.SliderGrab] = new Vector4(0.8784313797950745f, 0.8784313797950745f, 0.8784313797950745f, 1.0f);
+        style.Colors[(int)ImGuiCol.SliderGrabActive] = new Vector4(0.9803921580314636f, 0.9803921580314636f, 0.9803921580314636f, 1.0f);
+        style.Colors[(int)ImGuiCol.Button] = new Vector4(0.1490196138620377f, 0.1490196138620377f, 0.1490196138620377f, 1.0f);
+        style.Colors[(int)ImGuiCol.ButtonHovered] = new Vector4(0.2470588237047195f, 0.2470588237047195f, 0.2470588237047195f, 1.0f);
+        style.Colors[(int)ImGuiCol.ButtonActive] = new Vector4(0.3294117748737335f, 0.3294117748737335f, 0.3294117748737335f, 1.0f);
+        style.Colors[(int)ImGuiCol.Header] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.3098039329051971f);
+        style.Colors[(int)ImGuiCol.HeaderHovered] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.800000011920929f);
+        style.Colors[(int)ImGuiCol.HeaderActive] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 1.0f);
+        style.Colors[(int)ImGuiCol.Separator] = new Vector4(0.4274509847164154f, 0.4274509847164154f, 0.4980392158031464f, 0.5f);
+        style.Colors[(int)ImGuiCol.SeparatorHovered] = new Vector4(0.7490196228027344f, 0.7490196228027344f, 0.7490196228027344f, 0.7803921699523926f);
+        style.Colors[(int)ImGuiCol.SeparatorActive] = new Vector4(0.7490196228027344f, 0.7490196228027344f, 0.7490196228027344f, 1.0f);
+        style.Colors[(int)ImGuiCol.ResizeGrip] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.2000000029802322f);
+        style.Colors[(int)ImGuiCol.ResizeGripHovered] = new Vector4(0.9372549057006836f, 0.9372549057006836f, 0.9372549057006836f, 0.6705882549285889f);
+        style.Colors[(int)ImGuiCol.ResizeGripActive] = new Vector4(0.9764705896377563f, 0.9764705896377563f, 0.9764705896377563f, 0.9490196108818054f);
+        
+        style.Colors[(int)ImGuiCol.Tab] = new Vector4(0.2235294133424759f, 0.2235294133424759f, 0.2235294133424759f, 0.8627451062202454f);
+        style.Colors[(int)ImGuiCol.TabHovered] = new Vector4(0.321568638086319f, 0.321568638086319f, 0.321568638086319f, 0.800000011920929f);
+        style.Colors[(int)ImGuiCol.TabDimmed] = new Vector4(0.1450980454683304f, 0.1450980454683304f, 0.1450980454683304f, 0.9725490212440491f);
+        style.Colors[(int)ImGuiCol.TabSelected] = new Vector4(0.4235294163227081f, 0.4235294163227081f, 0.4235294163227081f, 1.0f);
+        style.Colors[(int)ImGuiCol.TabDimmedSelected] = new Vector4(0.2745098173618317f, 0.2745098173618317f, 0.2745098173618317f, 1.0f);
+        
+        style.Colors[(int)ImGuiCol.TabSelectedOverline] = new Vector4(0.4235294163227081f, 0.4235294163227081f, 0.4235294163227081f, 1.0f);
+        style.Colors[(int)ImGuiCol.TabDimmedSelectedOverline] = new Vector4(0.4235294163227081f, 0.4235294163227081f, 0.4235294163227081f, 1.0f);
 
-        opengl.BindBuffer(GLEnum.ArrayBuffer, vbo);
-        opengl.BindBuffer(GLEnum.ElementArrayBuffer, ebo);
-        opengl.EnableVertexAttribArray((uint) alocPos);
-        opengl.EnableVertexAttribArray((uint) alocUv);
-        opengl.EnableVertexAttribArray((uint) alocColor);
-        opengl.VertexAttribPointer((uint) alocPos, 2, GLEnum.Float, false, (uint) sizeof(ImDrawVert), (void*) 0);
-        opengl.VertexAttribPointer((uint) alocUv, 2, GLEnum.Float, false, (uint) sizeof(ImDrawVert), (void*) 8);
-        opengl.VertexAttribPointer((uint) alocColor, 4, GLEnum.UnsignedByte, true, (uint) sizeof(ImDrawVert), (void*) 16);
-    }
-
-    private unsafe void RenderImDrawData(ImDrawData* drawDataPtr)
-    {
-        int framebufferWidth = (int) (drawDataPtr->DisplaySize.X * drawDataPtr->FramebufferScale.X);
-        int framebufferHeight = (int) (drawDataPtr->DisplaySize.Y * drawDataPtr->FramebufferScale.Y);
-        if (framebufferWidth <= 0 || framebufferHeight <= 0) return;
-
-        opengl.GetInteger(GLEnum.ActiveTexture, out int lastActiveTexture);
-        opengl.ActiveTexture(GLEnum.Texture0);
-
-        opengl.GetInteger(GLEnum.CurrentProgram, out int lastProgram);
-        opengl.GetInteger(GLEnum.TextureBinding2D, out int lastTexture);
-        opengl.GetInteger(GLEnum.SamplerBinding, out int lastSampler);
-        opengl.GetInteger(GLEnum.ArrayBufferBinding, out int lastArrayBuffer);
-        opengl.GetInteger(GLEnum.VertexArrayBinding, out int lastVertexArrayObject);
-
-        Span<int> lastPolygonMode = stackalloc int[2];
-        opengl.GetInteger(GLEnum.PolygonMode, lastPolygonMode);
-        Span<int> lastScissorBox = stackalloc int[4];
-        opengl.GetInteger(GLEnum.ScissorBox, lastScissorBox);
-
-        opengl.GetInteger(GLEnum.BlendSrcRgb, out int lastBlendSrcRgb);
-        opengl.GetInteger(GLEnum.BlendDstRgb, out int lastBlendDstRgb);
-        opengl.GetInteger(GLEnum.BlendSrcAlpha, out int lastBlendSrcAlpha);
-        opengl.GetInteger(GLEnum.BlendDstAlpha, out int lastBlendDstAlpha);
-        opengl.GetInteger(GLEnum.BlendEquationRgb, out int lastBlendEquationRgb);
-        opengl.GetInteger(GLEnum.BlendEquationAlpha, out int lastBlendEquationAlpha);
-
-        bool lastEnableBlend = opengl.IsEnabled(GLEnum.Blend);
-        bool lastEnableCullFace = opengl.IsEnabled(GLEnum.CullFace);
-        bool lastEnableDepthTest = opengl.IsEnabled(GLEnum.DepthTest);
-        bool lastEnableStencilTest = opengl.IsEnabled(GLEnum.StencilTest);
-        bool lastEnableScissorTest = opengl.IsEnabled(GLEnum.ScissorTest);
-
-        SetupRenderState(drawDataPtr, framebufferWidth, framebufferHeight);
-
-        Vector2 clipOff = drawDataPtr->DisplayPos;
-        Vector2 clipScale = drawDataPtr->FramebufferScale;
-
-        for (int n = 0; n < drawDataPtr->CmdListsCount; n++)
-        {
-            ImDrawListPtr cmdListPtr = drawDataPtr->CmdLists.Data[n];
-
-            opengl.BufferData(GLEnum.ArrayBuffer, (nuint) (cmdListPtr.VtxBuffer.Size * sizeof(ImDrawVert)), (void*) cmdListPtr.VtxBuffer.Data, GLEnum.StreamDraw);
-            opengl.BufferData(GLEnum.ElementArrayBuffer, (nuint) (cmdListPtr.IdxBuffer.Size * sizeof(ushort)), (void*) cmdListPtr.IdxBuffer.Data, GLEnum.StreamDraw);
-
-            for (int cmd_i = 0; cmd_i < cmdListPtr.CmdBuffer.Size; cmd_i++)
-            {
-                ImDrawCmdPtr cmdPtr = &cmdListPtr.CmdBuffer.Data[cmd_i];
-
-                Vector4 clipRect;
-                clipRect.X = (cmdPtr.ClipRect.X - clipOff.X) * clipScale.X;
-                clipRect.Y = (cmdPtr.ClipRect.Y - clipOff.Y) * clipScale.Y;
-                clipRect.Z = (cmdPtr.ClipRect.Z - clipOff.X) * clipScale.X;
-                clipRect.W = (cmdPtr.ClipRect.W - clipOff.Y) * clipScale.Y;
-
-                if (clipRect.X < framebufferWidth && clipRect.Y < framebufferHeight && clipRect.Z >= 0.0f && clipRect.W >= 0.0f)
-                {
-                    opengl.Scissor((int) clipRect.X, (int) (framebufferHeight - clipRect.W), (uint) (clipRect.Z - clipRect.X), (uint) (clipRect.W - clipRect.Y));
-                    opengl.BindTexture(GLEnum.Texture2D, (uint)cmdPtr.TextureId.Handle);
-                    opengl.DrawElementsBaseVertex(GLEnum.Triangles, cmdPtr.ElemCount, GLEnum.UnsignedShort, (void*) (cmdPtr.IdxOffset * sizeof(ushort)), (int) cmdPtr.VtxOffset);
-                }
-            }
-        }
-
-        opengl.DeleteVertexArray(vao);
-        vao = 0;
-
-        opengl.UseProgram((uint) lastProgram);
-        opengl.BindTexture(GLEnum.Texture2D, (uint) lastTexture);
-        opengl.BindSampler(0, (uint) lastSampler);
-        opengl.ActiveTexture((GLEnum) lastActiveTexture);
-        opengl.BindVertexArray((uint) lastVertexArrayObject);
-        opengl.BindBuffer(GLEnum.ArrayBuffer, (uint) lastArrayBuffer);
-        opengl.BlendEquationSeparate((GLEnum) lastBlendEquationRgb, (GLEnum) lastBlendEquationAlpha);
-        opengl.BlendFuncSeparate((GLEnum) lastBlendSrcRgb, (GLEnum) lastBlendDstRgb, (GLEnum) lastBlendSrcAlpha, (GLEnum) lastBlendDstAlpha);
-
-        if (lastEnableBlend) opengl.Enable(GLEnum.Blend);
-        else opengl.Disable(GLEnum.Blend);
-
-        if (lastEnableCullFace) opengl.Enable(GLEnum.CullFace);
-        else opengl.Disable(GLEnum.CullFace);
-
-        if (lastEnableDepthTest) opengl.Enable(GLEnum.DepthTest);
-        else opengl.Disable(GLEnum.DepthTest);
-
-        if (lastEnableStencilTest) opengl.Enable(GLEnum.StencilTest);
-        else opengl.Disable(GLEnum.StencilTest);
-
-        if (lastEnableScissorTest) opengl.Enable(GLEnum.ScissorTest);
-        else opengl.Disable(GLEnum.ScissorTest);
-
-        opengl.Scissor(lastScissorBox[0], lastScissorBox[1], (uint) lastScissorBox[2], (uint) lastScissorBox[3]);
-    }
-
-    private void CreateDeviceResources()
-    {
-        opengl.GetInteger(GLEnum.TextureBinding2D, out int lastTexture);
-        opengl.GetInteger(GLEnum.ArrayBufferBinding, out int lastArrayBuffer);
-        opengl.GetInteger(GLEnum.VertexArrayBinding, out int lastVertexArray);
-
-        string vertexSource =
-        @"#version 330
-        layout (location = 0) in vec2 Position;
-        layout (location = 1) in vec2 UV;
-        layout (location = 2) in vec4 Color;
-        uniform mat4 ProjMtx;
-        out vec2 Frag_UV;
-        out vec4 Frag_Color;
-        void main()
-        {
-            Frag_UV = UV;
-            Frag_Color = Color;
-            gl_Position = ProjMtx * vec4(Position.xy,0,1);
-        }";
-
-        string fragmentSource =
-        @"#version 330
-        in vec2 Frag_UV;
-        in vec4 Frag_Color;
-        uniform sampler2D Texture;
-        layout (location = 0) out vec4 Out_Color;
-        void main()
-        {
-            Out_Color = Frag_Color * texture(Texture, Frag_UV.st);
-        }";
-
-        shader = new ImGuiShader(opengl, vertexSource, fragmentSource);
-
-        alocTex = shader.GetUniformLocation("Texture");
-        alocProj = shader.GetUniformLocation("ProjMtx");
-        alocPos = shader.GetAttribLocation("Position");
-        alocUv = shader.GetAttribLocation("UV");
-        alocColor = shader.GetAttribLocation("Color");
-
-        vbo = opengl.GenBuffer();
-        ebo = opengl.GenBuffer();
-
-        RecreateFontDeviceTexture();
-
-        opengl.BindTexture(GLEnum.Texture2D, (uint) lastTexture);
-        opengl.BindBuffer(GLEnum.ArrayBuffer, (uint) lastArrayBuffer);
-        opengl.BindVertexArray((uint) lastVertexArray);
-    }
-
-    private unsafe void RecreateFontDeviceTexture()
-    {
-        var io = ImGui.GetIO();
-        byte* pixels;
-        int width;
-        int height;
-        ImGui.GetTexDataAsRGBA32(io.Fonts, &pixels, &width, &height, null);
-        opengl.GetInteger(GLEnum.TextureBinding2D, out int lastTexture);
-        fontTexture = new ImGuiTexture(opengl, width, height, (nint)pixels);
-        fontTexture.Bind();
-        fontTexture.SetMagFilter(TextureMagFilter.Linear);
-        fontTexture.SetMinFilter(TextureMinFilter.Linear);
-        io.Fonts.SetTexID((Hexa.NET.ImGui.ImTextureID)fontTexture.GlTexture);
-        opengl.BindTexture(GLEnum.Texture2D, (uint) lastTexture);
+        style.Colors[(int)ImGuiCol.PlotLines] = new Vector4(0.6078431606292725f, 0.6078431606292725f, 0.6078431606292725f, 1.0f);
+        style.Colors[(int)ImGuiCol.PlotLinesHovered] = new Vector4(1.0f, 0.4274509847164154f, 0.3490196168422699f, 1.0f);
+        style.Colors[(int)ImGuiCol.PlotHistogram] = new Vector4(0.8980392217636108f, 0.6980392336845398f, 0.0f, 1.0f);
+        style.Colors[(int)ImGuiCol.PlotHistogramHovered] = new Vector4(1.0f, 0.6000000238418579f, 0.0f, 1.0f);
+        style.Colors[(int)ImGuiCol.TableHeaderBg] = new Vector4(0.1882352977991104f, 0.1882352977991104f, 0.2000000029802322f, 1.0f);
+        style.Colors[(int)ImGuiCol.TableBorderStrong] = new Vector4(0.3098039329051971f, 0.3098039329051971f, 0.3490196168422699f, 1.0f);
+        style.Colors[(int)ImGuiCol.TableBorderLight] = new Vector4(0.2274509817361832f, 0.2274509817361832f, 0.2470588237047195f, 1.0f);
+        style.Colors[(int)ImGuiCol.TableRowBg] = new Vector4(0.0f, 0.0f, 0.0f, 0.0f);
+        style.Colors[(int)ImGuiCol.TableRowBgAlt] = new Vector4(1.0f, 1.0f, 1.0f, 0.05999999865889549f);
+        style.Colors[(int)ImGuiCol.TextSelectedBg] = new Vector4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 0.3499999940395355f);
+        style.Colors[(int)ImGuiCol.DragDropTarget] = new Vector4(1.0f, 1.0f, 0.0f, 0.8999999761581421f);
+        style.Colors[(int)ImGuiCol.NavCursor] = new Vector4(0.2588235437870026f, 0.5882353186607361f, 0.9764705896377563f, 1.0f);
+        style.Colors[(int)ImGuiCol.NavWindowingHighlight] = new Vector4(1.0f, 1.0f, 1.0f, 0.699999988079071f);
+        style.Colors[(int)ImGuiCol.NavWindowingDimBg] = new Vector4(0.800000011920929f, 0.800000011920929f, 0.800000011920929f, 0.2000000029802322f);
+        style.Colors[(int)ImGuiCol.ModalWindowDimBg] = new Vector4(0.800000011920929f, 0.800000011920929f, 0.800000011920929f, 0.3499999940395355f);
     }
 }
 
@@ -674,99 +715,5 @@ class ImGuiShader
         _gl.CompileShader(shader);
         _gl.GetShader(shader, ShaderParameterName.CompileStatus, out var success);
         return shader;
-    }
-}
-
-public enum TextureCoordinate
-{
-    S = TextureParameterName.TextureWrapS,
-    T = TextureParameterName.TextureWrapT,
-    R = TextureParameterName.TextureWrapR
-}
-
-public class ImGuiTexture : IDisposable
-{
-    public const SizedInternalFormat Srgb8Alpha8 = (SizedInternalFormat) GLEnum.Srgb8Alpha8;
-    public const SizedInternalFormat Rgb32F = (SizedInternalFormat) GLEnum.Rgb32f;
-
-    public const GLEnum MaxTextureMaxAnisotropy = (GLEnum) 0x84FF;
-
-    public static float? MaxAniso;
-    private readonly GL _gl;
-    public readonly string Name;
-    public readonly uint GlTexture;
-    public readonly uint Width, Height;
-    public readonly uint MipmapLevels;
-    public readonly SizedInternalFormat InternalFormat;
-
-    public unsafe ImGuiTexture(GL gl, int width, int height, IntPtr data, bool generateMipmaps = false, bool srgb = false)
-    {
-        _gl = gl;
-        MaxAniso ??= gl.GetFloat(MaxTextureMaxAnisotropy);
-        Width = (uint) width;
-        Height = (uint) height;
-        InternalFormat = srgb ? Srgb8Alpha8 : SizedInternalFormat.Rgba8;
-        MipmapLevels = (uint) (generateMipmaps == false ? 1 : (int) Math.Floor(Math.Log(Math.Max(Width, Height), 2)));
-
-        GlTexture = _gl.GenTexture();
-        Bind();
-
-        PixelFormat pxFormat = PixelFormat.Bgra;
-
-        _gl.TexStorage2D(GLEnum.Texture2D, MipmapLevels, InternalFormat, Width, Height);
-        _gl.TexSubImage2D(GLEnum.Texture2D, 0, 0, 0, Width, Height, pxFormat, PixelType.UnsignedByte, (void*) data);
-
-        if (generateMipmaps) _gl.GenerateTextureMipmap(GlTexture);
-        SetWrap(TextureCoordinate.S, TextureWrapMode.Repeat);
-        SetWrap(TextureCoordinate.T, TextureWrapMode.Repeat);
-
-        int value = (int)(MipmapLevels - 1);
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMaxLevel, ref value);
-    }
-
-    public void Bind()
-    {
-        _gl.BindTexture(GLEnum.Texture2D, GlTexture);
-    }
-
-    public void SetMinFilter(TextureMinFilter filter)
-    {
-        int value = (int)filter;
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMinFilter, ref value);
-    }
-
-    public void SetMagFilter(TextureMagFilter filter)
-    {
-        int value = (int)filter;
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMagFilter, ref value);
-    }
-
-    public void SetAnisotropy(float level)
-    {
-        const TextureParameterName textureMaxAnisotropy = (TextureParameterName) 0x84FE;
-        _gl.TexParameter(GLEnum.Texture2D, (GLEnum) textureMaxAnisotropy, Clamp(level, 1, MaxAniso.GetValueOrDefault()));
-    }
-
-    public static float Clamp(float value, float min, float max)
-    {
-        return value < min ? min : value > max ? max : value;
-    }
-
-    public void SetLod(int basee, int min, int max)
-    {
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureLodBias, ref basee);
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMinLod, ref min);
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMaxLod, ref max);
-    }
-
-    public void SetWrap(TextureCoordinate coord, TextureWrapMode mode)
-    {
-        int value = (int)mode;
-        _gl.TexParameterI(GLEnum.Texture2D, (TextureParameterName) coord, ref value);
-    }
-
-    public void Dispose()
-    {
-        _gl.DeleteTexture(GlTexture);
     }
 }

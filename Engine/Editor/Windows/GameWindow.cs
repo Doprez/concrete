@@ -26,7 +26,8 @@ public static unsafe class GameWindow
         var gamecornerpos = ImGui.GetCursorPos();
 
         // show framebuffer as image
-        ImGui.Image((ImTextureID)GameRenderWindow.framebuffer.colorTexture, GameRenderWindow.framebuffer.size, Vector2.UnitY, Vector2.UnitX);
+        var imtexref = new ImTextureRef(null, new ImTextureID(GameRenderWindow.framebuffer.colorTexture));
+        ImGui.Image(imtexref, GameRenderWindow.framebuffer.size, Vector2.UnitY, Vector2.UnitX);
 
         {
             var buttonsize = new Vector2(0, 0);

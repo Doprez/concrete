@@ -38,7 +38,8 @@ public static unsafe class SceneWindow
         var scenecornerpos = ImGui.GetCursorPos();
 
         // show framebuffer as image
-        ImGui.Image((ImTextureID)SceneRenderWindow.framebuffer.colorTexture, SceneRenderWindow.framebuffer.size, Vector2.UnitY, Vector2.UnitX);
+        var imtexref = new ImTextureRef(null, new ImTextureID(SceneRenderWindow.framebuffer.colorTexture));
+        ImGui.Image(imtexref, SceneRenderWindow.framebuffer.size, Vector2.UnitY, Vector2.UnitX);
 
         // imguizmo
         if (HierarchyWindow.selectedGameObject != null)
