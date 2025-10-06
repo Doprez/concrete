@@ -7,7 +7,7 @@
 ![lines](https://sloc.xyz/github/sjoerdev/concrete/?lower=true)
 ![stars](https://img.shields.io/github/stars/sjoerdev/concrete?style=flat)
 ![version](https://img.shields.io/github/v/release/sjoerdev/concrete?include_prereleases)
-![license](https://img.shields.io/badge/license-GPLv3-blue.svg)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
 </div>
 
@@ -15,7 +15,7 @@
 
 - unity inspired structure
 - component based architecture
-- minimal imgui based editor
+- powerful imgui based editor
 - lightweight opengl renderer
 - skinned mesh rendering
 - complete gltf support
