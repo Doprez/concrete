@@ -77,6 +77,15 @@ public unsafe class ImGuiController
         ImGui.GetIO().Handle->IniFilename = null;
         ImGui.GetIO().ConfigFlags = ImGuiConfigFlags.DockingEnable;
         ImGui.StyleColorsDark();
+        
+        // ImGui.GetIO().ConfigDpiScaleFonts = true;
+        // ImGui.GetIO().ConfigDpiScaleViewports = true;
+        // ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DpiEnableScaleFonts;
+        // ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DpiEnableScaleViewports;
+        // ImGui.GetIO().DisplayFramebufferScale = new Vector2(1.5f, 1.5f);
+        // ImGui.GetStyle().FontScaleMain = 1.5f;
+        // ImGui.GetStyle().FontScaleDpi = 1.5f;
+        // ImGui.GetStyle().ScaleAllSizes(1.5f);
 
         // custom theme setup
         SetupCustomTheme();
