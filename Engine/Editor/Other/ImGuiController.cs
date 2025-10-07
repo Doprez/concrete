@@ -14,11 +14,11 @@ public unsafe class ImGuiController
     public ImPlotContextPtr plotContext;
 
     private GL opengl;
-    private IView view;
+    private IWindow window;
     private IInputContext input;
     private IKeyboard keyboard;
 
-    private readonly List<char> pressedchars = [];
+    private List<char> pressedchars = [];
 
     private int alocTex;
     private int alocProj;
@@ -32,69 +32,54 @@ public unsafe class ImGuiController
     
     private ImGuiShader shader;
 
-    // ImVector<byte> tempBuffer;
-
-    private int width;
-    private int height;
-
-    public ImGuiController(GL opengl, IView view, IInputContext input, string font = null, int fontSize = 14)
+    public ImGuiController(GL opengl, IWindow window, IInputContext input, string font = null, int fontSize = 14)
     {
-        // init window
+        // set silk refs
         this.opengl = opengl;
-        this.view = view;
+        this.window = window;
         this.input = input;
-        width = view.Size.X;
-        height = view.Size.Y;
-        keyboard = input.Keyboards[0];
-        view.Resize += WindowResized;
-        keyboard.KeyChar += OnKeyChar;
 
-        // create contexts
+        // create gui contexts and link them together
         guiContext = ImGui.CreateContext();
         plotContext = ImPlot.CreateContext();
-        UpdateContexts();
+        ImGui.SetCurrentContext(guiContext);
+        ImGuizmo.SetImGuiContext(guiContext);
+        ImPlot.SetImGuiContext(guiContext);
+        ImPlot.SetCurrentContext(plotContext);
 
-        // set backend flags
+        // set initial display size
+        ImGui.GetIO().DisplaySize = (Vector2)window.Size;
+        ImGui.GetIO().DisplayFramebufferScale = new Vector2(window.FramebufferSize.X / window.Size.X, window.FramebufferSize.Y / window.Size.Y);
+        
+        // handle window resizing
+        window.Resize += (newSize) => ImGui.GetIO().DisplaySize = (Vector2)newSize;
+
+        // remember pressed silk keyboard chars
+        keyboard = input.Keyboards[0];
+        keyboard.KeyChar += (keyboard, character) => pressedchars.Add(character);
+
+        // set flags
         ImGui.GetIO().BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset | ImGuiBackendFlags.RendererHasTextures;
-
-        // set font flags
         ImGui.GetIO().Fonts.Flags |= ImFontAtlasFlags.NoBakedLines;
+        ImGui.GetIO().ConfigFlags = ImGuiConfigFlags.DockingEnable;
 
-        // set font
+        // creates shader and buffers used for imgui rendering
+        SetupShaderAndBuffers();
+
+        // custom style
         if (font != null)
         {
             ImGui.GetIO().Fonts.Clear();
             ImGui.GetIO().Fonts.AddFontFromFileTTF(font, fontSize);
         }
-
-        // create device resources
-        CreateDeviceResources();
-
-        // initialize frame data
-        SetPerFrameImGuiData(1f / 60f);
-
-        // other imgui settings
         ImGui.GetIO().Handle->IniFilename = null;
-        ImGui.GetIO().ConfigFlags = ImGuiConfigFlags.DockingEnable;
         ImGui.StyleColorsDark();
-        
-        // ImGui.GetIO().ConfigDpiScaleFonts = true;
-        // ImGui.GetIO().ConfigDpiScaleViewports = true;
-        // ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DpiEnableScaleFonts;
-        // ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DpiEnableScaleViewports;
-        // ImGui.GetIO().DisplayFramebufferScale = new Vector2(1.5f, 1.5f);
-        // ImGui.GetStyle().FontScaleMain = 1.5f;
-        // ImGui.GetStyle().FontScaleDpi = 1.5f;
-        // ImGui.GetStyle().ScaleAllSizes(1.5f);
-
-        // custom theme setup
         SetupCustomTheme();
     }
 
     public void Update(float deltaTime)
     {
-        UpdateContexts();
-        SetPerFrameImGuiData(deltaTime);
+        ImGui.GetIO().DeltaTime = deltaTime;
         UpdateImGuiInput();
         ImGui.NewFrame();
         ImGuizmo.BeginFrame();
@@ -105,33 +90,6 @@ public unsafe class ImGuiController
         ImGui.Render();
         ImGui.EndFrame();
         RenderImDrawData(ImGui.GetDrawData());
-    }
-
-    public void UpdateContexts()
-    {
-        ImGui.SetCurrentContext(guiContext);
-        ImGuizmo.SetImGuiContext(guiContext);
-        ImPlot.SetImGuiContext(guiContext);
-        ImPlot.SetCurrentContext(plotContext);
-    }
-
-    private void OnKeyChar(IKeyboard keyboard, char character)
-    {
-        pressedchars.Add(character);
-    }
-
-    private void WindowResized(Vector2D<int> size)
-    {
-        width = size.X;
-        height = size.Y;
-    }
-
-    private void SetPerFrameImGuiData(float deltaSeconds)
-    {
-        var io = ImGui.GetIO();
-        io.DisplaySize = new Vector2(width, height);
-        if (width > 0 && height > 0) io.DisplayFramebufferScale = new Vector2(view.FramebufferSize.X / width, view.FramebufferSize.Y / height);
-        io.DeltaTime = deltaSeconds;
     }
 
     private void UpdateImGuiInput()
@@ -165,12 +123,7 @@ public unsafe class ImGuiController
         io.KeySuper = keyboardState.IsKeyPressed(Key.SuperLeft) || keyboardState.IsKeyPressed(Key.SuperRight);
     }
 
-    internal void PressChar(char keyChar)
-    {
-        pressedchars.Add(keyChar);
-    }
-
-    private unsafe void SetupRenderState(ImDrawDataPtr drawDataPtr, int framebufferWidth, int framebufferHeight)
+    private unsafe void SetupRenderState(ImDrawDataPtr drawDataPtr)
     {
         opengl.Enable(GLEnum.Blend);
         opengl.BlendEquation(GLEnum.FuncAdd);
@@ -306,7 +259,7 @@ public unsafe class ImGuiController
         bool lastEnableStencilTest = opengl.IsEnabled(GLEnum.StencilTest);
         bool lastEnableScissorTest = opengl.IsEnabled(GLEnum.ScissorTest);
 
-        SetupRenderState(drawDataPtr, framebufferWidth, framebufferHeight);
+        SetupRenderState(drawDataPtr);
 
         Vector2 clipOff = drawDataPtr->DisplayPos;
         Vector2 clipScale = drawDataPtr->FramebufferScale;
@@ -367,7 +320,7 @@ public unsafe class ImGuiController
         opengl.Scissor(lastScissorBox[0], lastScissorBox[1], (uint) lastScissorBox[2], (uint) lastScissorBox[3]);
     }
 
-    private void CreateDeviceResources()
+    private void SetupShaderAndBuffers()
     {
         string vertexSource =
         @"#version 330
