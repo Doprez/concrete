@@ -9,7 +9,7 @@ using Silk.NET.OpenGL;
 
 namespace Concrete;
 
-public static class Editor
+public static unsafe class Editor
 {
     public static ImGuiController igcontroller;
 
@@ -32,7 +32,14 @@ public static class Editor
     {
         NativeWindow.opengl = GL.GetApi(NativeWindow.window);
         NativeWindow.input = NativeWindow.window.CreateInput();
-        igcontroller = new ImGuiController(NativeWindow.opengl, NativeWindow.window, NativeWindow.input, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "cascadia.ttf").ToString(), 18);
+        
+        // setup imgui controller and styling
+        igcontroller = new ImGuiController(NativeWindow.opengl, NativeWindow.window, NativeWindow.input);
+        var cascadia = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "cascadia.ttf");
+        ImGui.GetIO().Fonts.Clear();
+        ImGui.GetIO().Fonts.AddFontFromFileTTF(cascadia, 18);
+        EditorTheme.SetupCustomTheme();
+        
         ProjectManager.TryLoadLastProjectOrCreateTempProject();
     }
 
