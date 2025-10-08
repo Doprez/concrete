@@ -101,7 +101,8 @@ public unsafe class ImGuiController
         foreach (var key in Enum.GetValues<Key>())
         {
             if (key == Key.Unknown) continue;
-            io.AddKeyEvent(ToImGuiKey(key), keyboardState.IsKeyPressed(key));
+            ImGuiKey imguiKey = SilkToImGuiKeyConverter.ToImGuiKey(key);
+            io.AddKeyEvent(imguiKey, keyboardState.IsKeyPressed(key));
         }
 
         foreach (var pressed in pressedchars) io.AddInputCharacter(pressed);
@@ -136,7 +137,7 @@ public unsafe class ImGuiController
             (R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f,
         ];
 
-        shader.UseShader();
+        shader.Use();
         opengl.Uniform1(alocTex, 0);
         opengl.UniformMatrix4(alocProj, 1, false, orthoProjection);
         opengl.BindSampler(0, 0);
@@ -348,8 +349,65 @@ public unsafe class ImGuiController
         vbo = opengl.GenBuffer();
         ebo = opengl.GenBuffer();
     }
+}
 
-    private ImGuiKey ToImGuiKey(Key key)
+class ImGuiShader
+{
+    private GL opengl;
+    public uint program;
+
+    public ImGuiShader(GL gl, string vertexShaderSource, string fragmentShaderSource)
+    {
+        opengl = gl;
+        program = CreateProgram(vertexShaderSource, fragmentShaderSource);
+    }
+
+    public void Use()
+    {
+        opengl.UseProgram(program);
+    }
+
+    public int GetUniformLocation(string uniform)
+    {
+        return opengl.GetUniformLocation(program, uniform);
+    }
+
+    public int GetAttribLocation(string attrib)
+    {
+        return opengl.GetAttribLocation(program, attrib);;
+    }
+
+    private uint CreateProgram(string vertexShaderSource, string fragmentShaderSource)
+    {
+        var program = opengl.CreateProgram();
+
+        uint vertShader = CompileShader(ShaderType.VertexShader, vertexShaderSource);
+        uint fragShader = CompileShader(ShaderType.FragmentShader, fragmentShaderSource);
+
+        opengl.AttachShader(program, vertShader);
+        opengl.AttachShader(program, fragShader);
+        opengl.LinkProgram(program);
+
+        opengl.DetachShader(program, vertShader);
+        opengl.DeleteShader(vertShader);
+        opengl.DetachShader(program, fragShader);
+        opengl.DeleteShader(fragShader);
+
+        return program;
+    }
+
+    private uint CompileShader(ShaderType type, string source)
+    {
+        var shader = opengl.CreateShader(type);
+        opengl.ShaderSource(shader, source);
+        opengl.CompileShader(shader);
+        return shader;
+    }
+}
+
+static class SilkToImGuiKeyConverter
+{
+    public static ImGuiKey ToImGuiKey(Key key)
     {
         return key switch
         {
@@ -460,127 +518,5 @@ public unsafe class ImGuiController
             Key.F12 => ImGuiKey.F12,
             _ => ImGuiKey.None,
         };
-    }
-}
-
-struct UniformFieldInfo
-{
-    public int Location;
-    public string Name;
-    public int Size;
-    public UniformType Type;
-}
-
-class ImGuiShader
-{
-    public uint Program { get; private set; }
-    private readonly Dictionary<string, int> _uniformToLocation = new Dictionary<string, int>();
-    private readonly Dictionary<string, int> _attribLocation = new Dictionary<string, int>();
-    private bool _initialized = false;
-    private GL _gl;
-    private (ShaderType Type, string Path)[] _files;
-
-    public ImGuiShader(GL gl, string vertexShader, string fragmentShader)
-    {
-        _gl = gl;
-        _files = new[]{
-            (ShaderType.VertexShader, vertexShader),
-            (ShaderType.FragmentShader, fragmentShader),
-        };
-        Program = CreateProgram(_files);
-    }
-    public void UseShader()
-    {
-        _gl.UseProgram(Program);
-    }
-
-    public void Dispose()
-    {
-        if (_initialized)
-        {
-            _gl.DeleteProgram(Program);
-            _initialized = false;
-        }
-    }
-
-    public UniformFieldInfo[] GetUniforms()
-    {
-        _gl.GetProgram(Program, GLEnum.ActiveUniforms, out var uniformCount);
-
-        UniformFieldInfo[] uniforms = new UniformFieldInfo[uniformCount];
-
-        for (int i = 0; i < uniformCount; i++)
-        {
-            string name = _gl.GetActiveUniform(Program, (uint) i, out int size, out UniformType type);
-
-            UniformFieldInfo fieldInfo;
-            fieldInfo.Location = GetUniformLocation(name);
-            fieldInfo.Name = name;
-            fieldInfo.Size = size;
-            fieldInfo.Type = type;
-
-            uniforms[i] = fieldInfo;
-        }
-
-        return uniforms;
-    }
-
-    public int GetUniformLocation(string uniform)
-    {
-        if (_uniformToLocation.TryGetValue(uniform, out int location) == false)
-        {
-            location = _gl.GetUniformLocation(Program, uniform);
-            _uniformToLocation.Add(uniform, location);
-        }
-
-        return location;
-    }
-
-    public int GetAttribLocation(string attrib)
-    {
-        if (_attribLocation.TryGetValue(attrib, out int location) == false)
-        {
-            location = _gl.GetAttribLocation(Program, attrib);
-            _attribLocation.Add(attrib, location);
-        }
-
-        return location;
-    }
-
-    private uint CreateProgram(params (ShaderType Type, string source)[] shaderPaths)
-    {
-        var program = _gl.CreateProgram();
-
-        Span<uint> shaders = stackalloc uint[shaderPaths.Length];
-        for (int i = 0; i < shaderPaths.Length; i++)
-        {
-            shaders[i] = CompileShader(shaderPaths[i].Type, shaderPaths[i].source);
-        }
-
-        foreach (var shader in shaders)
-            _gl.AttachShader(program, shader);
-
-        _gl.LinkProgram(program);
-
-        _gl.GetProgram(program, GLEnum.LinkStatus, out var success);
-
-        foreach (var shader in shaders)
-        {
-            _gl.DetachShader(program, shader);
-            _gl.DeleteShader(shader);
-        }
-
-        _initialized = true;
-
-        return program;
-    }
-
-    private uint CompileShader(ShaderType type, string source)
-    {
-        var shader = _gl.CreateShader(type);
-        _gl.ShaderSource(shader, source);
-        _gl.CompileShader(shader);
-        _gl.GetShader(shader, ShaderParameterName.CompileStatus, out var success);
-        return shader;
     }
 }
