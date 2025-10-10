@@ -73,7 +73,7 @@ public static unsafe class FilesWindow
         }
         movequeue.Clear();
 
-        ImGui.Begin("Files");
+        ImGui.Begin("\uf07c Files");
 
         hovered = ImGui.IsWindowHovered();
 

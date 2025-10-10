@@ -11,7 +11,7 @@ public static unsafe class GameWindow
     
     public static void Draw(float deltaTime)
     {
-        ImGui.Begin("Game", ImGuiWindowFlags.NoScrollbar);
+        ImGui.Begin("\uf11b Game", ImGuiWindowFlags.NoScrollbar);
         gameWindowFocussed = ImGui.IsWindowFocused();
 
         // render to framebuffer

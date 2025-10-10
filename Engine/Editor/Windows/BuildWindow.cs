@@ -19,7 +19,7 @@ public static class BuildWindow
 
     public static void Draw(float deltaTime)
     {
-        ImGui.Begin("Build", ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoScrollbar);
+        ImGui.Begin("\uf552 Build", ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoScrollbar);
 
         ImGui.Text("> Status:");
 

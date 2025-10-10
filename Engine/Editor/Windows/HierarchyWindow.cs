@@ -28,7 +28,7 @@ public static unsafe class HierarchyWindow
         reparentque.Clear();
 
         // render window
-        ImGui.Begin("Hierarchy");
+        ImGui.Begin("\uf0ca Hierarchy");
 
         var hbuttonsize = new Vector2(ImGui.GetContentRegionAvail().X / 2 - ImGui.GetStyle().ItemSpacing.X / 2, 0);
 

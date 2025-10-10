@@ -133,14 +133,14 @@ public static unsafe class Editor
             ImGuiP.DockBuilderSplitNode(left, ImGuiDir.Up, 0.5f, &topleft, &lowleft);
             ImGuiP.DockBuilderSplitNode(mid, ImGuiDir.Down, 0.3f, &lowmid, &topmid);
 
-            ImGuiP.DockBuilderDockWindow("Scene", topmid);
-            ImGuiP.DockBuilderDockWindow("Game", topmid);
-            ImGuiP.DockBuilderDockWindow("Build", topmid);
-            ImGuiP.DockBuilderDockWindow("Metrics", topmid);
-            ImGuiP.DockBuilderDockWindow("Hierarchy", topleft);
-            ImGuiP.DockBuilderDockWindow("Files", lowleft);
-            ImGuiP.DockBuilderDockWindow("Inspector", right);
-            ImGuiP.DockBuilderDockWindow("Console", lowmid);
+            ImGuiP.DockBuilderDockWindow("\uf009 Scene", topmid);
+            ImGuiP.DockBuilderDockWindow("\uf11b Game", topmid);
+            ImGuiP.DockBuilderDockWindow("\uf552 Build", topmid);
+            ImGuiP.DockBuilderDockWindow("\ue473 Metrics", topmid);
+            ImGuiP.DockBuilderDockWindow("\uf0ca Hierarchy", topleft);
+            ImGuiP.DockBuilderDockWindow("\uf07c Files", lowleft);
+            ImGuiP.DockBuilderDockWindow("\uf002 Inspector", right);
+            ImGuiP.DockBuilderDockWindow("\uf120 Console", lowmid);
 
             ImGuiP.DockBuilderFinish(dockspace);
             dockbuilderInitialized = true;

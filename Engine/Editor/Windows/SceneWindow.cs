@@ -15,7 +15,7 @@ public static unsafe class SceneWindow
     
     public static void Draw(float deltaTime)
     {
-        ImGui.Begin("Scene", ImGuiWindowFlags.NoScrollbar);
+        ImGui.Begin("\uf009 Scene", ImGuiWindowFlags.NoScrollbar);
         sceneWindowFocussed = ImGui.IsWindowFocused();
 
         // update scene camera movement

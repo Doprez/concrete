@@ -30,7 +30,7 @@ public static unsafe class InspectorWindow
     
     public static void Draw(float deltaTime)
     {
-        ImGui.Begin("Inspector");
+        ImGui.Begin("\uf002 Inspector");
         if (HierarchyWindow.selectedGameObject != null)
         {
             ImGui.PushID(HierarchyWindow.selectedGameObject.guid.ToString());

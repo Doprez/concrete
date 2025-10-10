@@ -8,7 +8,7 @@ public static unsafe class ConsoleWindow
 
     public static void Draw(float deltaTime)
     {
-        ImGui.Begin("Console", ImGuiWindowFlags.NoScrollbar);
+        ImGui.Begin("\uf120 Console", ImGuiWindowFlags.NoScrollbar);
 
         var consoleButtonWidth = 80;
         var consoleButtonWithSpacingWidth = consoleButtonWidth + ImGui.GetStyle().ItemSpacing.X;
