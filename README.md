@@ -37,6 +37,5 @@ lightObject.name = "Directional Light";
 
 ## Editor
 
-<img width="1602" height="938" alt="editor" src="https://github.com/user-attachments/assets/89057d49-1081-42ac-937a-94f078f44e1a" />
-
+<img width="1600" height="900" alt="editor" src="https://github.com/user-attachments/assets/3ba95a9a-f89a-439c-b82a-4b5c0f80b174" />
 
