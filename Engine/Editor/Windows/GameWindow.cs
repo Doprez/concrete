@@ -41,7 +41,7 @@ public static unsafe class GameWindow
             ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(0.9f, 0.9f, 0.9f, 1));
             ImGui.SetCursorPos(gamecornerpos + padding);
             ImGui.BeginDisabled(playing || paused);
-            if (ImGui.Button("play", buttonsize))
+            if (ImGui.Button("\uf04b play", buttonsize))
             {
                 ScriptManager.RecompileScripts(ProjectManager.projectRoot);
                 SceneManager.StartPlaying();
@@ -50,7 +50,7 @@ public static unsafe class GameWindow
             ImGui.EndDisabled();
             ImGui.SameLine();
             ImGui.BeginDisabled(stopped);
-            if (ImGui.Button(paused ? "continue" : "pause", buttonsize))
+            if (ImGui.Button(paused ? "\uf04b continue" : "\uf04c pause", buttonsize))
             {
                 if (paused) SceneManager.ContinuePlaying();
                 else SceneManager.PausePlaying();
@@ -58,7 +58,7 @@ public static unsafe class GameWindow
             ImGui.EndDisabled();
             ImGui.SameLine();
             ImGui.BeginDisabled(stopped);
-            if (ImGui.Button("stop", buttonsize)) SceneManager.StopPlaying();
+            if (ImGui.Button("\uf04d stop", buttonsize)) SceneManager.StopPlaying();
             ImGui.EndDisabled();
             ImGui.PopStyleColor(3);
         }
