@@ -20,7 +20,7 @@
 - skinned mesh rendering
 - complete gltf support
 
-## Example
+## Scripting
 ```csharp
 var scene = new Scene();
 LoadScene(scene);
@@ -35,5 +35,8 @@ lightObject.transform.localEulerAngles = new Vector3(20, 135, 0);
 lightObject.name = "Directional Light";
 ```
 
-## Gallery
-![editor](https://github.com/user-attachments/assets/dea8ea3c-4b27-4b38-b5ff-7cdeab2d563c)
+## Editor
+
+<img width="1602" height="938" alt="editor" src="https://github.com/user-attachments/assets/89057d49-1081-42ac-937a-94f078f44e1a" />
+
+
