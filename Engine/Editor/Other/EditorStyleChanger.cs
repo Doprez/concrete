@@ -3,8 +3,27 @@ using Hexa.NET.ImGui;
 
 namespace Concrete;
 
-public static class EditorTheme
+public static unsafe class EditorStyleChanger
 {
+    public static void ClearFonts()
+    {
+        ImGui.GetIO().Fonts.Clear();
+    }
+
+    public static void AddFont(string path, int baseSize, bool merge = false)
+    {
+        if (!merge)
+        {
+            ImGui.GetIO().Fonts.AddFontFromFileTTF(path, baseSize);
+        }
+        else
+        {
+            var fontConfigPtr = ImGui.ImFontConfig();
+            fontConfigPtr.MergeMode = true;
+            ImGui.GetIO().Fonts.AddFontFromFileTTF(path, baseSize, fontConfigPtr);
+        }
+    }
+
     public static void SetupCustomTheme()
     {
         ImGui.StyleColorsDark();

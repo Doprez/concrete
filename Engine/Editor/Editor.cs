@@ -35,21 +35,10 @@ public static unsafe class Editor
         
         // setup imgui controller and styling
         igcontroller = new ImGuiController(NativeWindow.opengl, NativeWindow.window, NativeWindow.input);
-
-        // remove build in font
-        ImGui.GetIO().Fonts.Clear();
-        
-        // setup cascadia mono font
-        var cascadia = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "cascadia.ttf");
-        ImGui.GetIO().Fonts.AddFontFromFileTTF(cascadia, 18);
-
-        // setup fontawesome icon font and merge it with cascadia
-        var fontawesome = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "fontawesome_free_solid.otf");
-        var fontConfigPtr = ImGui.ImFontConfig();
-        fontConfigPtr.MergeMode = true;
-        ImGui.GetIO().Fonts.AddFontFromFileTTF(fontawesome, 18, fontConfigPtr);
-
-        EditorTheme.SetupCustomTheme();
+        EditorStyleChanger.ClearFonts();
+        EditorStyleChanger.AddFont(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "cascadia.ttf"), 18);
+        EditorStyleChanger.AddFont(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "fontawesome_free_solid.otf"), 18, true);
+        EditorStyleChanger.SetupCustomTheme();
         
         ProjectManager.TryLoadLastProjectOrCreateTempProject();
     }
