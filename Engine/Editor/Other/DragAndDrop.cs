@@ -6,7 +6,7 @@ namespace Concrete;
 
 public static unsafe class DragAndDrop
 {
-    public static string TargetString(string type)
+    public static string GetString(string type)
     {
         if (ImGui.BeginDragDropTarget())
         {
@@ -22,7 +22,7 @@ public static unsafe class DragAndDrop
         return null;
     }
 
-    public static void SourceString(string type, string info, string display)
+    public static void GiveString(string type, string info, string display)
     {
         if (ImGui.BeginDragDropSource())
         {
@@ -36,7 +36,7 @@ public static unsafe class DragAndDrop
         }
     }
 
-    public static Guid? TargetGuid(string type)
+    public static Guid? GetGuid(string type)
     {
         if (ImGui.BeginDragDropTarget())
         {
@@ -52,7 +52,7 @@ public static unsafe class DragAndDrop
         return null;
     }
 
-    public static void SourceGuid(string type, Guid guid, string display)
+    public static void GiveGuid(string type, Guid guid, string display)
     {
         if (ImGui.BeginDragDropSource())
         {

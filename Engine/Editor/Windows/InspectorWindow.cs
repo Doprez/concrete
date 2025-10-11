@@ -56,7 +56,7 @@ public static unsafe class InspectorWindow
 
             // script drag and drop area
             ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
-            string file = DragAndDrop.TargetString("file_path");
+            string file = DragAndDrop.GetString("file_path");
             if (file != null)
             {
                 string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
@@ -204,7 +204,7 @@ public static unsafe class InspectorWindow
             ImGui.InputText(nametoshow, ref display, 100, ImGuiInputTextFlags.ReadOnly);
 
             // drag and dropping
-            string file = DragAndDrop.TargetString("file_path");
+            string file = DragAndDrop.GetString("file_path");
             if (file != null)
             {
                 string relative = Path.GetRelativePath(ProjectManager.projectRoot, file);
@@ -239,7 +239,7 @@ public static unsafe class InspectorWindow
             ImGui.InputText(nametoshow, ref display, 100, ImGuiInputTextFlags.ReadOnly);
 
             // drag and dropping
-            Guid? new_gobj_guid = DragAndDrop.TargetGuid("gameobject_guid");
+            Guid? new_gobj_guid = DragAndDrop.GetGuid("gameobject_guid");
             if (new_gobj_guid != null)
             {
                 var new_gobj = Scene.Current.FindGameObject(new_gobj_guid.Value);

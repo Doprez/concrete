@@ -109,7 +109,7 @@ public static unsafe class FilesWindow
             RenderDirectoryInsides(root);
 
             ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
-            string info = DragAndDrop.TargetString("file_path");
+            string info = DragAndDrop.GetString("file_path");
             if (info != null) movequeue.Add((info, ProjectManager.projectRoot));
 
             if (ImGui.BeginPopupContextItem("EmptySpaceRightClickMenu"))
@@ -202,7 +202,7 @@ public static unsafe class FilesWindow
                     else if (Shell.IsCommandInPath("notepad")) Shell.Run("notepad", path);
                 }
 
-                DragAndDrop.SourceString("file_path", path, endname);
+                DragAndDrop.GiveString("file_path", path, endname);
 
                 ImGui.PopID();
             }
@@ -248,9 +248,9 @@ public static unsafe class FilesWindow
 
                 if (ImGui.IsItemClicked()) selectedFileOrDir = path;
 
-                DragAndDrop.SourceString("file_path", path, endname);
+                DragAndDrop.GiveString("file_path", path, endname);
 
-                string info = DragAndDrop.TargetString("file_path");
+                string info = DragAndDrop.GetString("file_path");
                 if (info != null) movequeue.Add((info, path));
 
                 if (open)

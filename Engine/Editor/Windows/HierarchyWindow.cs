@@ -42,7 +42,7 @@ public static unsafe class HierarchyWindow
 
         foreach (var gameObject in Scene.Current.gameObjects) if (gameObject.transform.parent == null) DrawHierarchyMember(gameObject);
         ImGui.InvisibleButton("##", ImGui.GetContentRegionAvail());
-        Guid? guid = DragAndDrop.TargetGuid("gameobject_guid");
+        Guid? guid = DragAndDrop.GetGuid("gameobject_guid");
         if (guid != null)
         {
             var dragged = Scene.Current.FindGameObject(guid.Value);
@@ -63,9 +63,9 @@ public static unsafe class HierarchyWindow
         bool open = ImGui.TreeNodeEx(gameObject.name, flags);
         if (ImGui.IsItemClicked() && !ImGui.IsItemToggledOpen()) selectedGameObject = gameObject;
 
-        DragAndDrop.SourceGuid("gameobject_guid", guid, gameObject.name);
+        DragAndDrop.GiveGuid("gameobject_guid", guid, gameObject.name);
 
-        Guid? dragged_guid = DragAndDrop.TargetGuid("gameobject_guid");
+        Guid? dragged_guid = DragAndDrop.GetGuid("gameobject_guid");
         if (dragged_guid != null)
         {
             var dragged = Scene.Current.FindGameObject(dragged_guid.Value);
