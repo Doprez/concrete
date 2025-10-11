@@ -6,15 +6,41 @@ public static class Shell
 {
     public static void Run(string binary, string args)
     {
-        var processInfo = new ProcessStartInfo
+        var process = new Process
         {
-            FileName = binary,
-            Arguments = args,
-            UseShellExecute = true,
-            CreateNoWindow = true
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = binary,
+                Arguments = args,
+                UseShellExecute = true,
+                CreateNoWindow = true
+            }
         };
 
-        Process.Start(processInfo);
+        process.Start();
+    }
+
+    public static void Run(string binary, string args, out string stdout, out string stderror)
+    {
+        var process = new Process
+        {
+            StartInfo = new ProcessStartInfo
+            {
+                FileName = binary,
+                Arguments = args,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            }
+        };
+
+        process.Start();
+        stdout = process.StandardOutput.ReadToEnd();
+        stderror = process.StandardError.ReadToEnd();
+        process.WaitForExit();
+
+        process.Start();
     }
 
     public static bool IsCommandInPath(string command)

@@ -114,23 +114,9 @@ public static class BuildWindow
         if (platform == 0) rid = "win-x64";
         if (platform == 1) rid = "linux-x64";
 
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                Arguments = $"publish {csproj} -o {buildDirectory} -r {rid} -c release",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            }
-        };
+        string args = $"publish {csproj} -o {buildDirectory} -r {rid} -c release";
 
-        process.Start();
-        string output = process.StandardOutput.ReadToEnd();
-        string errors = process.StandardError.ReadToEnd();
-        process.WaitForExit();
+        Shell.Run("dotnet", args, out string output, out string errors);
 
         Debug.Log(output);
         if (!string.IsNullOrWhiteSpace(errors)) Debug.Log("Errors: " + errors);
