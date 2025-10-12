@@ -47,6 +47,10 @@ lightObject.name = "Directional Light";
 
 Download .NET 9: https://dotnet.microsoft.com/en-us/download
 
-Building for Windows: ``dotnet publish ./Engine/Editor/Editor.csproj -o ./Build/Windows/Editor -r win-x64 -c release --sc true``
+Building for Windows:
 
-Building for Linux: ``dotnet publish ./Engine/Editor/Editor.csproj -o ./Build/Linux/Editor -r linux-x64 -c release --sc true``
+``dotnet publish ./Engine/Editor/Editor.csproj -o ./Build/Windows -r win-x64 -c release --sc true``
+
+Building for Linux:
+
+``dotnet publish ./Engine/Editor/Editor.csproj -o ./Build/Linux -r linux-x64 -c release --sc true``
