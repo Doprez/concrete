@@ -16,6 +16,7 @@ public static class BuildWindow
     private static int platform = 0;
     private static string[] availablePlatforms = ["Windows x64", "Linux x64"];
 
+    private static bool hasDotnetSdkInstalled = Shell.IsCommandInPath("dotnet");
 
     public static void Draw(float deltaTime)
     {
@@ -28,6 +29,9 @@ public static class BuildWindow
         ImGui.Text(status);
 
         ImGui.Separator();
+        
+        if (!hasDotnetSdkInstalled) status = "The .NET SDK is not installed!";
+        ImGui.BeginDisabled(!hasDotnetSdkInstalled);
 
         ImGui.BeginDisabled(building);
 
@@ -63,7 +67,7 @@ public static class BuildWindow
         if (ImGui.Button("Start Building")) StartBuildingAsync();
         ImGui.EndDisabled();
 
-        
+        ImGui.EndDisabled();
 
         ImGui.EndDisabled();
 
