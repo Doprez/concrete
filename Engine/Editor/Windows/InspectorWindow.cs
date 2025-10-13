@@ -12,7 +12,28 @@ public static unsafe class InspectorWindow
     private static List<Component> removeComponentQue = [];
 
     private static Type[] allTypes = GetAllTypesInAllAssemblies();
-    private static Type[] componentTypes = allTypes.Where(type => type.IsClass && !type.IsAbstract && type != typeof(Transform) && type.IsSubclassOf(typeof(Component))).ToArray();
+    private static Type[] componentTypes = allTypes.Where(TypeIsAddableComponent).ToArray();
+
+    public static void RefreshComponentTypes()
+    {
+        allTypes = GetAllTypesInAllAssemblies();
+        componentTypes = allTypes.Where(TypeIsAddableComponent).ToArray();
+    }
+
+    private static bool TypeIsAddableComponent(Type type)
+    {
+        bool[] rules = 
+        [
+            type.IsSubclassOf(typeof(Component)),
+            type.IsClass,
+            !type.IsAbstract,
+            type != typeof(Transform),
+            type != typeof(InsertScriptName)
+        ];
+        
+        bool allowed = rules.All(x => x);
+        return allowed;
+    }
 
     private static Type[] GetAllTypesInAllAssemblies()
     {
@@ -20,12 +41,6 @@ public static unsafe class InspectorWindow
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
         foreach (var assembly in assemblies) types.AddRange(assembly.GetTypes());
         return types.ToArray();
-    }
-
-    public static void RefreshComponentTypes()
-    {
-        allTypes = GetAllTypesInAllAssemblies();
-        componentTypes = allTypes.Where(type => type.IsClass && !type.IsAbstract && type != typeof(Transform) && type.IsSubclassOf(typeof(Component))).ToArray();
     }
     
     public static void Draw(float deltaTime)
