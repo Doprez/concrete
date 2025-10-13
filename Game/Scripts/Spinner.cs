@@ -1,6 +1,5 @@
+using Concrete;
 using System.Numerics;
-
-namespace Concrete;
 
 public class Spinner : Component
 {
