@@ -11,17 +11,12 @@ public static unsafe class ConsoleWindow
         ImGui.Begin("\uf120 Console", ImGuiWindowFlags.NoScrollbar);
 
         var consoleButtonWidth = 80;
-        var consoleButtonWithSpacingWidth = consoleButtonWidth + ImGui.GetStyle().ItemSpacing.X;
-        var searchBoxWidth = ImGui.GetContentRegionAvail().X - (consoleButtonWithSpacingWidth * 2f);
+        var searchBoxWidth = ImGui.GetContentRegionAvail().X - consoleButtonWidth - ImGui.GetStyle().ItemSpacing.X;
 
         ImGui.SetNextItemWidth(searchBoxWidth);
         ImGui.InputText("##search", ref consoleSearchPrompt, 100);
         ImGui.SameLine();
-        if (ImGui.Button("clear", new(consoleButtonWidth, 0))) consoleSearchPrompt = "";
-        ImGui.SameLine();
-        if (ImGui.Button("reset", new(consoleButtonWidth, 0))) Debug.Clear();
-
-        //if (ImGui.Button("test", new(consoleButtonWidth, 0))) Debug.Log("asdfasdfasdf_" + new Random().Next(88));
+        if (ImGui.Button("clear", new(consoleButtonWidth, 0))) Debug.Clear();
 
         ImGui.Separator();
 
