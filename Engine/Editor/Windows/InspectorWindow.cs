@@ -11,12 +11,12 @@ public static unsafe class InspectorWindow
 {
     private static List<Component> removeComponentQue = [];
 
-    private static Type[] allTypes = GetAllTypesInAllAssemblies();
+    private static Type[] allTypes = GetAllTypesInAllAssembliesWithoutDuplicateTypes();
     private static Type[] componentTypes = allTypes.Where(TypeIsAddableComponent).ToArray();
 
     public static void RefreshComponentTypes()
     {
-        allTypes = GetAllTypesInAllAssemblies();
+        allTypes = GetAllTypesInAllAssembliesWithoutDuplicateTypes();
         componentTypes = allTypes.Where(TypeIsAddableComponent).ToArray();
     }
 
@@ -35,10 +35,10 @@ public static unsafe class InspectorWindow
         return allowed;
     }
 
-    private static Type[] GetAllTypesInAllAssemblies()
+    private static Type[] GetAllTypesInAllAssembliesWithoutDuplicateTypes()
     {
         List<Type> types = [];
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies().DistinctBy(a => a.FullName);
         foreach (var assembly in assemblies) types.AddRange(assembly.GetTypes());
         return types.ToArray();
     }
