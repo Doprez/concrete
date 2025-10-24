@@ -17,12 +17,14 @@
     <PackageReference Include="Hexa.NET.ImPlot" Version="2.2.9" />
   </ItemGroup>
 
+  <!-- include resources the editor needs -->
   <ItemGroup>
     <Content Include="Resources/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
+  <!-- include the source code for building a player with the editor -->
   <ItemGroup>
     <Content Include="../Shared/**" Exclude="../Shared/bin/**;../Shared/obj/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
