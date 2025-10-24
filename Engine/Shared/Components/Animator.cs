@@ -1,4 +1,3 @@
-using System.Numerics;
 using SharpGLTF.Runtime;
 
 namespace Concrete;

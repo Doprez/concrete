@@ -1,4 +1,3 @@
-using System.Drawing;
 using System.Reflection;
 using Silk.NET.Input;
 using Silk.NET.Maths;

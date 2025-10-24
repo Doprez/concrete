@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using System.Numerics;
-using System.Text;
 
 using Hexa.NET.ImGui;
 

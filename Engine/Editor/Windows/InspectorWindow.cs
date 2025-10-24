@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Reflection;
 
 using Hexa.NET.ImGui;
-using System.Text;
 
 namespace Concrete;
 
