@@ -18,17 +18,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources/**/*.*">
+    <Content Include="Resources/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="../Shared/**/*" Exclude="../Shared/bin/**;../Shared/obj/**">
+    <Content Include="../Shared/**" Exclude="../Shared/bin/**;../Shared/obj/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>Resources/SourceForGameBuilding/Shared/%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
-    <Content Include="../Player/**/*" Exclude="../Player/bin/**;../Player/obj/**">
+    <Content Include="../Player/**" Exclude="../Player/bin/**;../Player/obj/**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Link>Resources/SourceForGameBuilding/Player/%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Content>
